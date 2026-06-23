@@ -10,6 +10,18 @@ export const metadata: Metadata = {
     title: "Lethe — 고요히 흘려보내다",
     description: "당신의 디지털 흔적 정리 경험을 들려주세요.",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Lethe",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-image.png"],
   },
 };
 
