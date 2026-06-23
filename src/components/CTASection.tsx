@@ -146,7 +146,7 @@ export default function CTASection() {
                 </p>
                 {"linkText" in activeItem ? (
                   <a
-                    href="#story"
+                    href="/notes/right-to-be-forgotten"
                     className="group mt-3 inline-flex items-center text-base leading-8 text-white/58 transition-all duration-300 hover:text-white/82 hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-4"
                   >
                     <span className="border-b border-transparent transition-colors duration-300 group-hover:border-white/45">
