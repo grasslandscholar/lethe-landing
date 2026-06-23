@@ -135,25 +135,25 @@ function MiniDashboard({
   }
 
   return (
-    <div className="grid grid-cols-2 items-center gap-6 border border-slate-200 bg-white/75 p-6">
+    <div className="grid grid-cols-2 items-center gap-3 border border-slate-200 bg-white/75 p-4 md:gap-6 md:p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-slate-300">
-          <span className="absolute -top-px left-1/2 h-1.5 w-6 -translate-x-1/2 bg-white" />
-          <p className="font-display text-3xl font-light text-slate-800">
-            23<span className="ml-1 text-sm text-slate-500">{visuals.organize.unit}</span>
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-300 md:h-24 md:w-24">
+          <span className="absolute -top-px left-1/2 h-1.5 w-5 -translate-x-1/2 bg-white md:w-6" />
+          <p className="font-display text-2xl font-light text-slate-800 md:text-3xl">
+            23<span className="ml-0.5 text-xs text-slate-500 md:ml-1 md:text-sm">{visuals.organize.unit}</span>
           </p>
         </div>
-        <p className="mt-4 text-sm text-slate-600">{visuals.organize.keep}</p>
+        <p className="mt-3 text-xs text-slate-600 md:mt-4 md:text-sm">{visuals.organize.keep}</p>
       </div>
 
       <div className="flex flex-col items-center border-l border-slate-200 text-center">
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-slate-300">
-          <span className="absolute -top-px left-1/2 h-1.5 w-5 -translate-x-1/2 bg-white" />
-          <p className="font-display text-2xl font-light text-slate-800">
-            5<span className="ml-1 text-xs text-slate-500">{visuals.organize.unit}</span>
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-slate-300 md:h-20 md:w-20">
+          <span className="absolute -top-px left-1/2 h-1.5 w-4 -translate-x-1/2 bg-white md:w-5" />
+          <p className="font-display text-xl font-light text-slate-800 md:text-2xl">
+            5<span className="ml-0.5 text-xs text-slate-500">{visuals.organize.unit}</span>
           </p>
         </div>
-        <p className="mt-4 text-sm text-slate-600">{visuals.organize.release}</p>
+        <p className="mt-3 text-xs text-slate-600 md:mt-4 md:text-sm">{visuals.organize.release}</p>
       </div>
     </div>
   );
