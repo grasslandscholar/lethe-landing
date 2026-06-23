@@ -7,7 +7,7 @@ export default function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative h-[100svh] min-h-[680px] flex items-center justify-center overflow-hidden bg-[#0b1e29]">
+    <section className="relative h-[100svh] min-h-[680px] flex items-center justify-center overflow-hidden bg-[#0b1e29]" style={{ touchAction: "pan-y" }}>
       <Image
         src="/images/river-hero-poster.png"
         alt=""
