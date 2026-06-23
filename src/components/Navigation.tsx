@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Locale } from "@/i18n/translations";
 import { openPrivacyModal } from "./PrivacyModal";
@@ -12,15 +13,23 @@ const LOCALES: { code: Locale; label: string }[] = [
   { code: "ja", label: "JA" },
 ];
 
-export default function Navigation() {
+interface NavigationProps {
+  forceScrolled?: boolean;
+}
+
+export default function Navigation({ forceScrolled = false }: NavigationProps) {
   const { locale, t, setLocale } = useLanguage();
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const logoHref = pathname === "/" ? "#" : "/";
+  const [scrolledState, setScrolledState] = useState(false);
+  const scrolled = forceScrolled || scrolledState;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    if (forceScrolled) return;
+    const onScroll = () => setScrolledState(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [forceScrolled]);
 
   return (
     <header
@@ -30,7 +39,7 @@ export default function Navigation() {
     >
       <nav className="max-w-6xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
         <a
-          href="#"
+          href={logoHref}
           className={`relative block transition-all duration-500 ${
             scrolled ? "h-9 w-32 md:h-11 md:w-40" : "h-9 w-28 md:h-10 md:w-32"
           }`}

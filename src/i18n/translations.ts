@@ -140,6 +140,47 @@ export const translations = {
       privacy: "쓰는 정보",
       contact: "문의하기",
     },
+    note01: {
+      label: "Lethe Note 01",
+      title: "정말 나는\n잊힐 권리를\n가지고 있는가.",
+      intro: "문득 든 생각에 계정을 삭제해 보기로 했습니다.\n그리고, 생각보다 긴 여정이 시작되었습니다.",
+      sections: [
+        {
+          heading: null,
+          body: [
+            "계정을 하나 삭제하려고 했습니다.",
+            "간단한 일이라고 생각했습니다. 설정 메뉴를 열고, 탈퇴 버튼을 누르고, 확인하면 끝날 줄 알았습니다. 하지만 실제로는 다섯 번의 이메일을 주고받아야 했고, 삭제가 완료되기까지 17일이 걸렸습니다.",
+            "그 과정에서 GDPR과 개인정보 삭제 요청 절차를 공부했습니다. 하지만 돌아오는 답변의 대부분은 형식적인 안내이거나, 책임을 미루는 회신이었습니다.",
+          ],
+        },
+        {
+          heading: "연결 해제와 삭제는\n같은 의미가 아닙니다.",
+          body: [
+            "많은 서비스에서 '탈퇴'는 계정의 로그인 접근을 막는 것일 뿐, 데이터 자체를 지우지 않습니다. 백업 서버에, 파트너사에, 광고 플랫폼에 — 당신의 흔적은 여전히 어딘가에 남아 있을 수 있습니다.",
+            "탈퇴했는데도 정보가 남아있다는 사실을 아는 사람은 많지 않습니다. 알더라도, 그것을 실제로 지우는 방법을 아는 사람은 더 적습니다.",
+          ],
+        },
+        {
+          heading: "어디에 가입했는지\n기억도 잘 안 났습니다.",
+          body: [
+            "삭제를 시도하면서 처음 마주한 문제는, 내가 어느 서비스에 어떤 이메일로 가입했는지를 제대로 파악하지 못하고 있다는 것이었습니다.",
+            "오래된 계정은 스스로도 찾기 어려운 경우가 있습니다. 소셜 로그인으로 가입한 계정, 이벤트 때 잠깐 사용한 서비스, 더 이상 존재하지 않는다고 생각했던 앱들. 그것들은 여전히 어딘가에 내 정보를 갖고 있었습니다.",
+          ],
+        },
+        {
+          heading: "혼자서 하기에는\n생각보다 훨씬 어려운 일.",
+          body: [
+            "정보를 지운다는 것은 권리의 문제이기도 하지만, 동시에 매우 실용적인 문제이기도 합니다. 어디에 연락해야 하는지, 어떤 형식으로 요청해야 하는지, 얼마나 기다려야 하는지 — 이 모든 것을 혼자 파악하고 실행하는 것은 생각보다 많은 시간과 에너지를 요구합니다.",
+            "Lethe는 그 질문에서 시작되었습니다.",
+          ],
+        },
+      ],
+      cta: {
+        heading: "당신의 경험도\nLethe의 첫 흐름이 됩니다.",
+        button: "인터뷰 신청하기",
+        note: "* 약 30분 소요.",
+      },
+    },
     privacy: {
       title: "당신이 알려준 정보는 어떻게 사용될까요?",
       subtitle: "(개인정보처리방침)",
@@ -337,6 +378,47 @@ export const translations = {
       privacy: "Data We Use",
       contact: "Contact",
     },
+    note01: {
+      label: "Lethe Note 01",
+      title: "Do I really have\nthe right\nto be forgotten?",
+      intro: "A passing question led me to try deleting an account.\nAnd a longer journey than expected began.",
+      sections: [
+        {
+          heading: null,
+          body: [
+            "I tried to delete one account.",
+            "I thought it would be simple — open settings, hit the delete button, confirm. Instead, it took five emails and 17 days until the deletion was complete.",
+            "Along the way, I studied GDPR and personal data deletion requests. Most replies were formal instructions or messages that passed responsibility elsewhere.",
+          ],
+        },
+        {
+          heading: "Disconnecting and deleting\nare not always the same.",
+          body: [
+            "For many services, 'leaving' only blocks access to the account — it does not erase the data. In backup servers, with partners, in ad platforms — your traces may still remain somewhere.",
+            "Most people don't know that information can remain even after they leave. And fewer still know how to actually remove it.",
+          ],
+        },
+        {
+          heading: "I couldn't even remember\nwhere I had signed up.",
+          body: [
+            "The first thing I ran into when trying to delete was realizing I didn't have a clear picture of which services I'd joined with which email.",
+            "Old accounts can be hard to find on your own. Accounts created through social login, services used briefly for a promotion, apps I thought no longer existed — they still held my information somewhere.",
+          ],
+        },
+        {
+          heading: "Much harder than one person\nshould have to do alone.",
+          body: [
+            "Removing information is a question of rights, but it is also a very practical one. Who to contact, what form the request should take, how long to wait — figuring all of this out and following through on your own takes more time and energy than most people expect.",
+            "Lethe began with that question.",
+          ],
+        },
+      ],
+      cta: {
+        heading: "Your experience can be\nthe first current of Lethe.",
+        button: "Apply for Interview",
+        note: "* About 30 minutes.",
+      },
+    },
     privacy: {
       title: "How will the information you share be used?",
       subtitle: "(Privacy Policy)",
@@ -533,6 +615,47 @@ export const translations = {
       rights: "© 2026 Lethe. All rights reserved.",
       privacy: "使う情報",
       contact: "お問い合わせ",
+    },
+    note01: {
+      label: "Lethe Note 01",
+      title: "本当に私は\n忘れられる権利を\n持っているのか。",
+      intro: "ふと思い立ち、アカウントを削除してみることにしました。\nそして、思ったより長い旅が始まりました。",
+      sections: [
+        {
+          heading: null,
+          body: [
+            "ひとつのアカウントを削除しようとしました。",
+            "簡単なことだと思っていました。設定を開いて、削除ボタンを押して、確認すれば終わると思っていました。しかし実際には5回のメールをやり取りし、削除が完了するまで17日かかりました。",
+            "その過程で、GDPRと個人情報削除請求について学びました。返ってきた答えの多くは形式的な案内か、責任を移すような返信でした。",
+          ],
+        },
+        {
+          heading: "連携解除と削除は\nいつも同じ意味ではありません。",
+          body: [
+            "多くのサービスで「退会」とはアカウントへのログインを遮断するだけで、データ自体を消すことではありません。バックアップサーバーに、パートナー企業に、広告プラットフォームに — あなたの痕跡はまだどこかに残っているかもしれません。",
+            "退会しても情報が残ることを知っている人は多くありません。知っていたとしても、それを実際に消す方法を知っている人はさらに少ないです。",
+          ],
+        },
+        {
+          heading: "どこに登録したのかも\n覚えていませんでした。",
+          body: [
+            "削除を試みて最初に直面したのは、自分がどのサービスにどのメールアドレスで登録したのかを把握できていないという現実でした。",
+            "古いアカウントは自分でも見つけにくいことがあります。ソーシャルログインで作ったアカウント、キャンペーンで一時的に使ったサービス、もう存在しないと思っていたアプリ。それらはまだどこかに私の情報を持っていました。",
+          ],
+        },
+        {
+          heading: "個人が一人で行うには\n思ったよりずっと難しいこと。",
+          body: [
+            "情報を消すことは権利の問題であると同時に、とても実践的な問題でもあります。どこに連絡するか、どんな形式でリクエストするか、どのくらい待つか — これらすべてを一人で把握して実行するには、多くの人が想像する以上の時間とエネルギーが必要です。",
+            "Letheはその問いから始まりました。",
+          ],
+        },
+      ],
+      cta: {
+        heading: "あなたの経験も\nLetheの最初の流れになります。",
+        button: "インタビューに申し込む",
+        note: "* 約30分。",
+      },
     },
     privacy: {
       title: "あなたが知らせた情報はどのように使われますか？",
