@@ -48,6 +48,11 @@ body {
   to   { opacity: 1; }
 }
 
+@keyframes voiceFlow {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .animate-fade-in {
   animation: fadeIn 1s var(--ease-gentle) forwards;
 }
@@ -56,9 +61,14 @@ body {
   animation: fadeInSlow 1.8s var(--ease-gentle) forwards;
 }
 
+.animate-voice-flow {
+  animation: voiceFlow 650ms var(--ease-gentle) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
-  .animate-fade-in-slow {
+  .animate-fade-in-slow,
+  .animate-voice-flow {
     animation: none;
     opacity: 1;
     transform: none;

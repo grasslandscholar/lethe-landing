@@ -3,12 +3,12 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lethe — 디지털 흔적을 고요하게 정리하다",
+  title: "Lethe — 고요히 흘려보내다",
   description:
-    "Lethe는 흩어진 계정과 개인정보를 추적하고, 위험도를 분석하며, 깔끔하게 정리할 수 있도록 돕는 디지털 개인정보 대시보드입니다.",
+    "계정 삭제와 개인정보 정리 경험에서 시작된 Lethe의 초기 사용자 인터뷰 모집 랜딩페이지입니다.",
   openGraph: {
-    title: "Lethe — 디지털 흔적을 고요하게 정리하다",
-    description: "흩어진 계정과 개인정보를 한눈에. 인터뷰에 참여해주세요.",
+    title: "Lethe — 고요히 흘려보내다",
+    description: "당신의 디지털 흔적 정리 경험을 들려주세요.",
     type: "website",
   },
 };

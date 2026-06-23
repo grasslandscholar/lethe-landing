@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Locale } from "@/i18n/translations";
+import { openPrivacyModal } from "./PrivacyModal";
 
 const LOCALES: { code: Locale; label: string }[] = [
   { code: "ko", label: "KO" },
@@ -27,14 +29,34 @@ export default function Navigation() {
       }`}
     >
       <nav className="max-w-6xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
-        <span
-          className="font-display text-xl tracking-[0.25em] font-light"
-          style={{ color: scrolled ? "var(--color-slate)" : "#fff" }}
+        <a
+          href="#"
+          className={`relative block transition-all duration-500 ${
+            scrolled ? "h-9 w-32 md:h-11 md:w-40" : "h-9 w-28 md:h-10 md:w-32"
+          }`}
+          aria-label="Lethe home"
         >
-          LETHE
-        </span>
+          <Image
+            src={scrolled ? "/brand/lethe-black-logo.png" : "/brand/lethe-white-logo.png"}
+            alt="Lethe"
+            fill
+            priority
+            className="object-contain object-left"
+            sizes={scrolled ? "160px" : "128px"}
+          />
+        </a>
 
         <div className="flex items-center gap-6 md:gap-8">
+          <button
+            type="button"
+            onClick={openPrivacyModal}
+            className={`hidden min-h-[44px] items-center text-xs tracking-widest transition-colors md:flex ${
+              scrolled ? "text-slate-500 hover:text-slate-800" : "text-white/62 hover:text-white"
+            }`}
+          >
+            {t.nav.privacy}
+          </button>
+
           {/* Language toggle */}
           <div className="flex items-center gap-1">
             {LOCALES.map((l, i) => (

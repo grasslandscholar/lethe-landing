@@ -3,9 +3,9 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { translations, type Locale, type Translations } from "@/i18n/translations";
@@ -17,27 +17,65 @@ interface LanguageContextValue {
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
+const LOCALES: Locale[] = ["ko", "en", "ja"];
+const STORAGE_KEY = "lethe-locale";
+
+const listeners = new Set<() => void>();
+let localeOverride: Locale | null = null;
+
+function isLocale(value: string | null): value is Locale {
+  return value !== null && LOCALES.includes(value as Locale);
+}
 
 function detectLocale(): Locale {
   if (typeof window === "undefined") return "ko";
-  const stored = localStorage.getItem("lethe-locale") as Locale | null;
-  if (stored && ["ko", "en", "ja"].includes(stored)) return stored;
+
+  const urlLocale = new URLSearchParams(window.location.search).get("lang");
+  if (isLocale(urlLocale)) return urlLocale;
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (isLocale(stored)) return stored;
+
   const lang = navigator.language.slice(0, 2).toLowerCase();
   if (lang === "ja") return "ja";
   if (lang === "en") return "en";
   return "ko";
 }
 
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  window.addEventListener("popstate", callback);
+  queueMicrotask(callback);
+
+  return () => {
+    listeners.delete(callback);
+    window.removeEventListener("popstate", callback);
+  };
+}
+
+function getClientSnapshot() {
+  return localeOverride ?? detectLocale();
+}
+
+function getServerSnapshot(): Locale {
+  return "ko";
+}
+
+function notifyLocaleChange() {
+  listeners.forEach((listener) => listener());
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("ko");
+  const locale = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
   useEffect(() => {
-    setLocaleState(detectLocale());
-  }, []);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    localStorage.setItem("lethe-locale", next);
+    localeOverride = next;
+    localStorage.setItem(STORAGE_KEY, next);
+    notifyLocaleChange();
   }, []);
 
   return (
