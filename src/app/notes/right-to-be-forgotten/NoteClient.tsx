@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -47,8 +48,23 @@ export default function NoteClient() {
           <div className="border-t border-[#e8e0d5]" />
         </div>
 
+        {/* River image */}
+        <FadeInWhenVisible>
+          <div className="max-w-2xl mx-auto px-10 md:px-16 pt-10">
+            <div className="relative aspect-[3/2] overflow-hidden">
+              <Image
+                src="/images/note-river.jpg"
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 672px"
+              />
+            </div>
+          </div>
+        </FadeInWhenVisible>
+
         {/* Article body */}
-        <article className="max-w-2xl mx-auto px-6 md:px-8 py-16 md:py-24 space-y-16">
+        <article className="max-w-2xl mx-auto px-6 md:px-8 pt-8 pb-16 md:pb-24 space-y-16">
           {note.sections.map((section, i) => (
             <FadeInWhenVisible key={i} delay={i * 40}>
               <section className="space-y-6">
@@ -58,7 +74,7 @@ export default function NoteClient() {
                   </h2>
                 )}
                 {section.body.map((paragraph, j) => (
-                  <p key={j} className="text-base md:text-lg leading-[1.95] text-[#2c3e50]">
+                  <p key={j} className={`text-base md:text-lg leading-[1.95] text-[#2c3e50] ${i === 0 && j === 0 ? "font-semibold" : ""}`}>
                     {paragraph}
                   </p>
                 ))}
