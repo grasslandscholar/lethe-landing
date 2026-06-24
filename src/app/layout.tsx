@@ -36,6 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <LanguageProvider>{children}</LanguageProvider>
         <Analytics />
+        <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bdf20fd4754744798c8a075d5f398c32"}'></script>
       </body>
     </html>
   );
