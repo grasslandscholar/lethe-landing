@@ -52,6 +52,7 @@ const CONTENT = {
     s3p3: "목소리도, 의지도 있지만, 어떻게 해야 하는지를 모르면, 법정 언어와 절차를 모르면 우리는 그저 억울한 사람으로만 남습니다.",
     s3p4: "세상이 많이 발전한다면 언젠가 이런 고민을 할 필요도 없는 순간이 올 수도 있겠지만, 적어도 현재와 미래 사이의 과도기에 살아가는 우리는 여전히 고민해야 한다고 생각합니다.",
     s3p5: "다른 누구도 아닌, 소중한 나 자신을 위하여.",
+    transition: "이 즈음에서 제가 도달한 결론은 이렇습니다.",
     nextLabel: "다음 노트에서는",
     nextBody: "기존 개인정보 보호 서비스가 존재함에도, 왜 저는 밤을 새며 직접 계정을 찾고 삭제하고 있었을까요.",
     nextEnd: "Data Broker Problem에서\nAccount Discovery Problem으로.",
@@ -94,6 +95,7 @@ const CONTENT = {
     s3p3: "You have a voice and the will — but if you don't know how, if you don't speak the language and know the procedures of the courtroom, you remain nothing more than someone with an unheard grievance.",
     s3p4: "As the world advances, there may come a day when none of this requires thought. But at least those of us living through this transition between now and that future must still grapple with it.",
     s3p5: "For no one else — for yourself.",
+    transition: "And this is the conclusion I arrived at.",
     nextLabel: "In the next note",
     nextBody: "Despite existing privacy protection services, why was I still staying up nights, finding and deleting accounts myself.",
     nextEnd: "From Data Broker Problem\nto Account Discovery Problem.",
@@ -136,6 +138,7 @@ const CONTENT = {
     s3p3: "声も意志もあるのに、どうすればいいかわからなければ、法廷の言語と手続きを知らなければ、私たちはただ理不尽を抱えた者として残るだけです。",
     s3p4: "世の中が大きく進歩すれば、いつかこんなことを考える必要もない日が来るかもしれません。しかし少なくとも、現在と未来の間の過渡期を生きる私たちは、まだ考え続けなければならないと思います。",
     s3p5: "ほかの誰でもない、大切な自分自身のために。",
+    transition: "この頃、私が辿り着いた結論はこうです。",
     nextLabel: "次のノートでは",
     nextBody: "既存のプライバシー保護サービスがあるにもかかわらず、なぜ私は夜を明かして自らアカウントを探し、削除していたのでしょうか。",
     nextEnd: "Data Broker Problemから\nAccount Discovery Problemへ。",
@@ -278,15 +281,19 @@ export default function NoteClient() {
                 <p className="text-base md:text-lg leading-[1.95] text-[#2c3e50]">{c.corpMain}</p>
                 <Continuation>{c.corpCont}</Continuation>
               </div>
+
+              <p className="text-base md:text-lg leading-[1.95] text-[#2c3e50] pt-8 text-center">{c.transition}</p>
             </section>
           </FadeInWhenVisible>
+
+          <SectionDivider />
 
           {/* Section 3: 권리는 존재합니다 */}
           <FadeInWhenVisible>
             <section className="space-y-6">
 
               {/* Pullquote */}
-              <div className="py-16 border-t border-[#e8e0d5] mt-16">
+              <div className="pb-16 border-b border-[#e8e0d5]">
                 <p className="font-display font-light text-3xl md:text-4xl leading-snug text-[#2c3e50]">
                   {c.pullquoteMain}
                 </p>
@@ -295,7 +302,7 @@ export default function NoteClient() {
                 </p>
               </div>
 
-              <div className="border-t border-[#e8e0d5] pt-8 mb-2">
+              <div className="pt-2">
                 <p className="text-base md:text-lg leading-[1.95] text-[#2c3e50] font-bold">
                   {c.bold}
                 </p>
