@@ -21,6 +21,12 @@ export default function Navigation({ forceScrolled = false }: NavigationProps) {
   const { locale, t, setLocale } = useLanguage();
   const pathname = usePathname();
   const logoHref = pathname === "/" ? "#" : "/";
+  const INTERVIEW_FORM_URLS: Record<string, string> = {
+    ko: "https://forms.gle/eJyygJXEwKfLWgPR8",
+    en: "https://forms.gle/rxVPZWnhXr2xQBgd8",
+    ja: "https://forms.gle/nijRn2Tbdo7Ggb5u7",
+  };
+  const ctaHref = pathname === "/" ? "#interview" : INTERVIEW_FORM_URLS[locale];
   const [scrolledState, setScrolledState] = useState(false);
   const scrolled = forceScrolled || scrolledState;
 
@@ -89,7 +95,9 @@ export default function Navigation({ forceScrolled = false }: NavigationProps) {
 
           {/* CTA */}
           <a
-            href="#interview"
+            href={ctaHref}
+            target={pathname === "/" ? undefined : "_blank"}
+            rel={pathname === "/" ? undefined : "noopener noreferrer"}
             className={`hidden md:flex items-center text-xs tracking-widest px-5 py-2.5 border transition-all duration-300 ${
               scrolled
                 ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white"

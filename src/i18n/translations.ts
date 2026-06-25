@@ -338,8 +338,8 @@ export const translations = {
     },
     cta: {
       label: "Interview",
-      heading: "As drops gather\ninto a river,\nvoices are gathering.",
-      body: "Your experience can help build a better digital environment.",
+      heading: "Every current\nhas a beginning.",
+      body: "Your experience becomes the first flow of Lethe.",
       perks: [
         "I didn't know my information could remain after leaving.",
         "I couldn't remember where I had signed up.",
@@ -365,10 +365,10 @@ export const translations = {
         },
       ],
       button: "Apply for Interview",
-      note: "About 30 minutes. Anonymous participation is welcome.",
+      note: "* About 30 minutes.",
       transparency: {
         heading: "Lethe only uses the information needed for interview applications on this page.",
-        body: "We collect only a name or nickname,\nemail address,\nand application details.\n\nCollected information is used to run interviews\nand for Lethe research and development.\n\nYou can ask us to delete it at any time.",
+        body: "We collect only a name or nickname, email address, and application details.\nCollected information is used to run interviews and for Lethe research and development.\nYou can ask us to delete it at any time.",
         button: "View Data Use",
       },
     },
@@ -576,8 +576,8 @@ export const translations = {
     },
     cta: {
       label: "インタビュー",
-      heading: "水滴が集まり\n川になるように、\n声が集まっています。",
-      body: "あなたの経験が、よりよいデジタル環境をつくります。",
+      heading: "すべての流れには\n始まりがあります。",
+      body: "あなたの経験が、Letheの最初の流れになります。",
       perks: [
         "退会後も情報が残るとは知りませんでした。",
         "どこに登録したのかも覚えていませんでした。",
@@ -603,10 +603,10 @@ export const translations = {
         },
       ],
       button: "インタビューに申し込む",
-      note: "約30分。匿名での参加も可能です。",
+      note: "* 所要時間：約30分。",
       transparency: {
         heading: "Letheは、このページでインタビュー申込に必要な情報だけを使用します。",
-        body: "名前またはニックネーム、\nメールアドレス、\n申込内容のみを受け取ります。\n\n収集された情報はインタビュー進行と\nLetheの研究・開発のために使用されます。\n\nいつでも削除を依頼できます。",
+        body: "名前またはニックネーム、メールアドレス、申込内容のみを受け取ります。\n収集された情報はインタビュー進行とLetheの研究・開発のために使用されます。\nいつでも削除を依頼できます。",
         button: "使う情報を見る",
       },
     },
@@ -654,7 +654,7 @@ export const translations = {
       cta: {
         heading: "あなたの経験も\nLetheの最初の流れになります。",
         button: "インタビューに申し込む",
-        note: "* 約30分。",
+        note: "* 所要時間：約30分。",
       },
     },
     privacy: {
