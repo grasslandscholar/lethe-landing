@@ -47,17 +47,17 @@ export default function Navigation({ forceScrolled = false }: NavigationProps) {
         <a
           href={logoHref}
           className={`relative block transition-all duration-500 ${
-            scrolled ? "h-9 w-32 md:h-11 md:w-40" : "h-9 w-28 md:h-10 md:w-32"
+            scrolled ? "h-[38px] w-[115px] md:h-[43px] md:w-[134px]" : "h-8 w-24 md:h-9 md:w-28"
           }`}
           aria-label="Lethe home"
         >
           <Image
-            src={scrolled ? "/brand/lethe-black-logo.png" : "/brand/lethe-white-logo.png"}
+            src={scrolled ? "/brand/textlogowB.svg" : "/brand/textlogowW.svg"}
             alt="Lethe"
             fill
             priority
             className="object-contain object-left"
-            sizes={scrolled ? "160px" : "128px"}
+            sizes={scrolled ? "134px" : "112px"}
           />
         </a>
 

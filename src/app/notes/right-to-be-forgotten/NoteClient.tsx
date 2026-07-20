@@ -323,9 +323,9 @@ export default function NoteClient() {
               {/* Lethe mark */}
               <div className="flex justify-center pt-10 pb-2">
                 <Image
-                  src="/brand/lethe-black-mark.png"
+                  src="/brand/markonlyB.svg"
                   alt="Lethe"
-                  width={32}
+                  width={69}
                   height={32}
                   className="opacity-25"
                 />
