@@ -1,0 +1,486 @@
+import type { Locale } from "./types";
+
+export interface CypressContent {
+  hero: { eyebrow: string; title: string; body: string };
+  cta: { start: string; howTo: string };
+  trust: { localTitle: string; storageTitle: string; storageBody: string; opennessTitle: string };
+  howto: {
+    kakaoTitle: string;
+    kakaoSteps: string[];
+    naverTitle: string;
+    naverSteps: string[];
+  };
+  dropzone: { main: string; sub: string; privacyNote: string };
+  formats: { kakaoTitle: string; kakaoDesc: string; naverTitle: string; naverDesc: string; unsupportedNote: string };
+  preStart: { title: string; body: string; legalNote: string; privacyLink: string };
+  progress: { reading: string; parsing: string; scoring: string; done: string };
+  errors: {
+    harUnrecognized: string;
+    fileTypeUnrecognized: string;
+  };
+  disclaimer: { snapshot: string; scoreMeaning: string };
+  tabs: {
+    naver: string;
+    kakao: string;
+    kakaoCollect: string;
+    kakaoCollectExtra: string;
+    kakaoProvider: string;
+    generic: string;
+  };
+  summary: {
+    serviceCount: string;
+    sensitiveCount: string;
+    comparableTag: string;
+    platformOnlyTag: string;
+    noScoreNote: string;
+  };
+  toolbar: { searchPlaceholder: string; sortButton: string };
+  methodology: { summary: string; intro: string };
+  rows: {
+    whyScore: (count: number, hasStale: boolean) => string;
+    comboNote: string;
+    staleNote: (days: number) => string;
+    cleanupBadge: (days: number) => string;
+    emptyResult: string;
+  };
+  report: {
+    button: string;
+    print: string;
+    close: string;
+    title: string;
+    generatedAt: (date: string) => string;
+    overview: string;
+    tableHead: { tab: string; serviceCount: string; sensitiveCount: string };
+    topRisk: string;
+    topRiskHead: { name: string; tab: string; score: string; items: string };
+    cleanup: string;
+    cleanupNone: string;
+    categories: string;
+    categoriesNone: string;
+    recommendations: string;
+    recHigh: (count: number) => string;
+    recCleanup: (count: number) => string;
+    recReident: (count: number) => string;
+    recFinance: (count: number) => string;
+    recSnapshot: string;
+    recScoreMeaning: string;
+    footNote: string;
+  };
+  footer: { local: string; experimental: string; privacy: string };
+  deleteFlow: {
+    ctaAvailable: string;
+    ctaUnavailable: string;
+    ctaRequested: string;
+    newTabNote: string;
+    mailtoFallbackIntro: string;
+    copyButton: string;
+    copyDone: string;
+    mailtoSubject: (serviceName: string) => string;
+    mailtoBody: (serviceName: string) => string;
+    bulkButton: string;
+    bulkModalTitle: string;
+    bulkModalBody: string;
+    bulkModalEmpty: string;
+    bulkModalConfirm: (count: number) => string;
+    bulkModalCancel: string;
+  };
+}
+
+export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
+  ko: {
+    hero: {
+      eyebrow: "Personal Data Ledger",
+      title: "내 개인정보, 어디에 얼마나 남아 있을까",
+      body: "카카오·네이버 개인정보 현황 파일을 브라우저 안에서만 분석합니다. 서버로 전송되지 않으며, 새로고침하면 모든 데이터가 사라집니다.",
+    },
+    cta: { start: "시작하기 — 파일 업로드", howTo: "파일 준비 방법 보기" },
+    trust: {
+      localTitle: "로컬 처리",
+      storageTitle: "저장 없음",
+      storageBody: "localStorage·IndexedDB를 사용하지 않습니다. 탭을 닫으면 데이터가 즉시 소멸합니다.",
+      opennessTitle: "열린 분석",
+    },
+    howto: {
+      kakaoTitle: "카카오",
+      kakaoSteps: [
+        "accounts.kakao.com 로그인 → 계정 이용 → 개인정보 이용 현황",
+        "\"수집 및 이용\" / \"제3자 제공\" / \"처리 위탁\" 탭을 각각 클릭 → Cmd/Ctrl+S로 저장 (총 3개 파일)",
+      ],
+      naverTitle: "네이버",
+      naverSteps: [
+        "nid.naver.com에서 연결된 서비스 관리 페이지 저장 (목록만 캡처됨)",
+        "더 정확히 하려면: 개발자도구 Network 탭 → 페이지 새로고침 → 우클릭 → Save all as HAR로 통째로 저장",
+      ],
+    },
+    dropzone: {
+      main: "여기로 파일을 끌어다 놓으세요",
+      sub: "카카오 HTML 3종(수집 및 이용/제3자 제공/처리 위탁) · 네이버 HTML · 네이버 HAR/JSON — 여러 개 한번에 가능",
+      privacyNote: "서버로 전송되지 않음 · 이 브라우저 탭 안에서만 처리됨",
+    },
+    formats: {
+      kakaoTitle: "카카오 개인정보 현황",
+      kakaoDesc: "개인정보 이용 현황 페이지를 HTML로 저장한 파일 (.html)",
+      naverTitle: "네이버 연결된 서비스",
+      naverDesc: "네이버 계정 설정에서 내보낸 HTML 저장본 또는 HAR 파일 (.html / .har)",
+      unsupportedNote: "지원하지 않는 파일 형식을 업로드하면 인식 실패 안내와 함께 저장 방법을 안내받을 수 있습니다.",
+    },
+    preStart: {
+      title: "시작하기 전에 확인하세요",
+      body: "이 도구는 가입·연동 당시 동의한 항목의 스냅샷을 분석합니다. 실시간 수집 내역이 아닐 수 있습니다.",
+      legalNote: "분석 결과는 법적 효력이 없으며 참고용 정보입니다.",
+      privacyLink: "개인정보 처리방침 확인",
+    },
+    progress: {
+      reading: "파일 읽는 중",
+      parsing: "분석하는 중",
+      scoring: "위험도 채점 중",
+      done: "완료",
+    },
+    errors: {
+      harUnrecognized: "HAR 파일 안에서 연결된 서비스 데이터를 찾지 못했습니다. 연결된 서비스 페이지를 새로고침한 뒤 다시 내보내주세요.",
+      fileTypeUnrecognized: "이 파일 형식을 인식하지 못했습니다. 지원 형식(.html/.htm/.json/.har)을 확인해주세요.",
+    },
+    disclaimer: {
+      snapshot: "이 데이터는 가입/연동 당시 동의한 항목의 스냅샷입니다.",
+      scoreMeaning: "점수는 기업 신뢰도가 아니라, 정보가 유출되면 얼마나 심각한가를 뜻합니다.",
+    },
+    tabs: {
+      naver: "네이버 연결된 서비스",
+      kakao: "카카오 연결 서비스",
+      kakaoCollect: "수집 및 이용",
+      kakaoCollectExtra: "수집 및 이용 – 부가 정보(용도 확인 필요)",
+      kakaoProvider: "처리 위탁",
+      generic: "연결된 서비스 목록",
+    },
+    summary: {
+      serviceCount: "가입/연동된 서비스 수",
+      sensitiveCount: "민감정보 보유 서비스 수",
+      comparableTag: "외부 제공형 · 다른 플랫폼과 비교 가능",
+      platformOnlyTag: "플랫폼 자체 보유형 · 다른 플랫폼과 직접 비교 불가",
+      noScoreNote: "이 탭은 항목 단위 데이터가 없어 채점 대상이 아닙니다.",
+    },
+    toolbar: { searchPlaceholder: "서비스명으로 검색…", sortButton: "위험도 높은 순" },
+    methodology: {
+      summary: "이 위험도 점수는 어떻게 계산되나요 (v1 초안)",
+      intro:
+        "수집·제공되는 항목 텍스트를 15개 카테고리로 분류하고, 카테고리별 가중치를 합산해 0~100점으로 정규화합니다. 제3자 제공 항목은 1.3배 가중하고, 이름·생년월일·연락처·주소 중 3개 이상이 함께 쓰이면 재식별 위험 보너스를 더합니다. 법적으로 검증된 기준이 아니라 우선순위를 잡기 위한 휴리스틱 초안입니다.",
+    },
+    rows: {
+      whyScore: (count, hasStale) => `왜 ${count}개 요소${hasStale ? " + 방치 가산" : ""}인가`,
+      comboNote: "이름·생년월일·연락처·주소 중 3개 이상이 함께 있어 추가 가산되었습니다.",
+      staleNote: (days) => `마지막 이용일로부터 약 ${days}일 지남 — 오래 방치된 연결은 유출·오남용을 알아차리기 어려워 위험도를 가산했습니다.`,
+      cleanupBadge: (days) => `정리 후보 · ${days}일 미사용`,
+      emptyResult: "결과가 없어요",
+    },
+    report: {
+      button: "요약 리포트 만들기 (A4 1장)",
+      print: "인쇄 / PDF로 저장",
+      close: "닫기",
+      title: "내 정보 노출 현황 리포트",
+      generatedAt: (date) => `생성일시: ${date} · Personal Data Ledger v1 (실험적 기능)`,
+      overview: "한눈에 보기",
+      tableHead: { tab: "탭(플랫폼)", serviceCount: "서비스 수", sensitiveCount: "민감정보 보유(60점+)" },
+      topRisk: "가장 주의가 필요한 서비스",
+      topRiskHead: { name: "서비스명", tab: "탭", score: "점수", items: "주요 노출 항목" },
+      cleanup: "정리 후보 (오래 방치된 연결)",
+      cleanupNone: "현재 기준 정리 후보가 발견되지 않았습니다.",
+      categories: "많이 노출된 정보 유형",
+      categoriesNone: "집계할 채점 데이터가 없습니다.",
+      recommendations: "앞으로의 개선 방향",
+      recHigh: (count) => `민감 정보(60점 이상)를 보유한 서비스가 총 ${count}개입니다. 실제로 쓰고 있는지 하나씩 점검하고, 안 쓰는 곳은 연결을 해제하세요.`,
+      recCleanup: (count) => `${count}개 이상의 서비스가 오랫동안(91일 이상) 사용되지 않았습니다. 점수와 무관하게 정리 1순위 대상입니다.`,
+      recReident: (count) => `${count}개 서비스가 CI/DI 등 교차식별 정보를 갖고 있습니다. 이 값을 가진 서비스는 계정 보안(2단계 인증 등)을 특히 강화하세요.`,
+      recFinance: (count) => `${count}개 서비스가 금융/결제 정보를 갖고 있습니다. 이체·소액결제 알림을 켜두면 이상 거래를 빨리 알아챌 수 있습니다.`,
+      recSnapshot: "이 리포트는 가입·연동 시점에 동의한 항목의 스냅샷입니다. 실제 서비스 이용 중 직접 입력한 배송지·결제수단 등은 포함되지 않을 수 있습니다.",
+      recScoreMeaning: "점수는 정보의 민감도(노출됐을 때 위험한 정도)일 뿐, 그 기업의 보안 수준을 평가하지 않습니다. 우선순위를 정하는 도구로만 활용하세요.",
+      footNote: "본 리포트는 개인 검증용 실험적 프로토타입으로 생성되었으며, 법적으로 검증된 개인정보 위험 평가가 아닙니다. 브라우저 내에서 로컬로 분석한 결과이며, 외부로 전송되지 않았습니다.",
+    },
+    footer: {
+      local: "업로드한 파일은 이 브라우저 탭에서만 처리되며 외부로 전송되지 않습니다.",
+      experimental: "기술 검증용 프로토타입 — 스키마가 바뀌면 파서 갱신이 필요합니다.",
+      privacy: "개인정보 처리방침",
+    },
+    deleteFlow: {
+      ctaAvailable: "Lethe로 해당 서비스 탈퇴 및 정보 삭제하기",
+      ctaUnavailable: "이것도 삭제하고 싶어요",
+      ctaRequested: "신청 완료",
+      newTabNote: "메일 앱에서 새 창으로 열립니다.",
+      mailtoFallbackIntro: "메일 앱이 열리지 않으면 아래 내용을 복사해서 직접 보내주세요.",
+      copyButton: "복사하기",
+      copyDone: "복사됨",
+      mailtoSubject: (serviceName) => `[개인정보 삭제 요청] ${serviceName}`,
+      mailtoBody: (serviceName) =>
+        `안녕하세요,\n\n개인정보 보호법 제36조(개인정보의 정정·삭제 등)에 따라 ${serviceName}에 연동되어 있는 저의 계정 및 개인정보에 대한 삭제(파기)를 요청합니다.\n\n확인 후 처리 결과를 회신해 주시면 감사하겠습니다.\n\n감사합니다.`,
+      bulkButton: "일괄 신청",
+      bulkModalTitle: "정리 신청 서비스 선택",
+      bulkModalBody: "지금 삭제 진행이 불가능한 서비스 목록입니다. 신청할 서비스를 선택해주세요 — 팀이 확인 후 지원 대상에 추가합니다.",
+      bulkModalEmpty: "지금은 신청할 서비스가 없습니다.",
+      bulkModalConfirm: (count) => `선택한 ${count}개 서비스 신청하기`,
+      bulkModalCancel: "취소",
+    },
+  },
+  en: {
+    hero: {
+      eyebrow: "Personal Data Ledger",
+      title: "How much of my data is out there?",
+      body: "Lethe analyzes your Kakao/Naver personal-data export entirely inside your browser. Nothing is sent to a server, and everything disappears when you refresh.",
+    },
+    cta: { start: "Start — upload a file", howTo: "See how to prepare your files" },
+    trust: {
+      localTitle: "Local processing",
+      storageTitle: "Nothing stored",
+      storageBody: "No localStorage or IndexedDB is used. Data disappears the moment you close the tab.",
+      opennessTitle: "Open scoring",
+    },
+    howto: {
+      kakaoTitle: "Kakao",
+      kakaoSteps: [
+        "Log in at accounts.kakao.com → Account → Personal data usage status",
+        "Open each of \"Collection & Use\" / \"Third-party sharing\" / \"Processing outsourcing\" and save with Cmd/Ctrl+S (3 files total)",
+      ],
+      naverTitle: "Naver",
+      naverSteps: [
+        "Save the connected-services page from nid.naver.com (captures the list only)",
+        "For full detail: open DevTools Network tab → refresh the page → right-click → \"Save all as HAR\"",
+      ],
+    },
+    dropzone: {
+      main: "Drop your files here",
+      sub: "Kakao's 3 HTML files (collection/third-party/outsourcing) · Naver HTML · Naver HAR/JSON — multiple at once is fine",
+      privacyNote: "Never sent to a server · processed only in this browser tab",
+    },
+    formats: {
+      kakaoTitle: "Kakao personal data status",
+      kakaoDesc: "The personal-data usage page saved as HTML (.html)",
+      naverTitle: "Naver connected services",
+      naverDesc: "HTML export from Naver account settings, or a HAR file (.html / .har)",
+      unsupportedNote: "If an unsupported file type is uploaded, you'll get a recognition-failure notice with saving instructions.",
+    },
+    preStart: {
+      title: "Before you start",
+      body: "This tool analyzes a snapshot of what you agreed to at signup/linking time — it may not reflect real-time collection.",
+      legalNote: "Results have no legal standing and are for reference only.",
+      privacyLink: "View privacy policy",
+    },
+    progress: {
+      reading: "Reading files",
+      parsing: "Analyzing",
+      scoring: "Scoring risk",
+      done: "Done",
+    },
+    errors: {
+      harUnrecognized: "Couldn't find connected-service data in this HAR file. Refresh the connected-services page and export again.",
+      fileTypeUnrecognized: "This file type wasn't recognized. Please check the supported formats (.html/.htm/.json/.har).",
+    },
+    disclaimer: {
+      snapshot: "This data is a snapshot of what you agreed to at signup or linking time.",
+      scoreMeaning: "The score isn't a measure of a company's trustworthiness — it reflects how severe a leak of this data would be.",
+    },
+    tabs: {
+      naver: "Naver connected services",
+      kakao: "Kakao connected services",
+      kakaoCollect: "Collection & use",
+      kakaoCollectExtra: "Collection & use – additional data (purpose unverified)",
+      kakaoProvider: "Processing outsourcing",
+      generic: "Connected services",
+    },
+    summary: {
+      serviceCount: "Linked services",
+      sensitiveCount: "Services holding sensitive data",
+      comparableTag: "Externally shared · comparable across platforms",
+      platformOnlyTag: "Platform-held only · not directly comparable across platforms",
+      noScoreNote: "This tab has no item-level data, so it isn't scored.",
+    },
+    toolbar: { searchPlaceholder: "Search by service name…", sortButton: "Sort by risk" },
+    methodology: {
+      summary: "How is this risk score calculated (v1 draft)",
+      intro:
+        "Collected/shared item text is classified into 15 categories, weights are summed, and normalized to a 0–100 score. Third-party sharing is weighted ×1.3, and a re-identification bonus is added when 3+ of name/birthdate/phone/address appear together. This is not a legally validated standard — it's a v1 heuristic for prioritizing cleanup.",
+    },
+    rows: {
+      whyScore: (count, hasStale) => `Why ${count} factor${count === 1 ? "" : "s"}${hasStale ? " + dormancy bonus" : ""}`,
+      comboNote: "3 or more of name/birthdate/phone/address appear together, adding a re-identification bonus.",
+      staleNote: (days) => `About ${days} days since last use — long-dormant connections make abuse harder to notice, so risk was increased.`,
+      cleanupBadge: (days) => `Cleanup candidate · unused ${days} days`,
+      emptyResult: "No results",
+    },
+    report: {
+      button: "Create summary report (1-page A4)",
+      print: "Print / Save as PDF",
+      close: "Close",
+      title: "Personal data exposure report",
+      generatedAt: (date) => `Generated: ${date} · Personal Data Ledger v1 (experimental)`,
+      overview: "Overview",
+      tableHead: { tab: "Tab (platform)", serviceCount: "Services", sensitiveCount: "Sensitive data (60+)" },
+      topRisk: "Services needing the most attention",
+      topRiskHead: { name: "Service", tab: "Tab", score: "Score", items: "Key exposed items" },
+      cleanup: "Cleanup candidates (long-dormant connections)",
+      cleanupNone: "No cleanup candidates found right now.",
+      categories: "Most-exposed data types",
+      categoriesNone: "No scored data to aggregate.",
+      recommendations: "What to do next",
+      recHigh: (count) => `${count} service${count === 1 ? "" : "s"} hold sensitive data (60+ points). Check whether you still use each one, and disconnect the ones you don't.`,
+      recCleanup: (count) => `${count}+ services haven't been used in 91+ days. These are top cleanup priorities regardless of score.`,
+      recReident: (count) => `${count} service${count === 1 ? "" : "s"} hold cross-service identifiers (CI/DI). Strengthen account security (e.g. 2FA) for these.`,
+      recFinance: (count) => `${count} service${count === 1 ? "" : "s"} hold financial/payment data. Turning on transaction alerts helps you catch unusual activity quickly.`,
+      recSnapshot: "This report is a snapshot of what you agreed to at signup/linking — it may not include things you entered directly later, like shipping addresses or payment methods.",
+      recScoreMeaning: "The score reflects data sensitivity only, not a company's security posture. Use it to prioritize, not to judge trust.",
+      footNote: "This report was generated by an experimental prototype for personal use — it is not a legally validated privacy risk assessment. Everything was analyzed locally in your browser and never sent anywhere.",
+    },
+    footer: {
+      local: "Uploaded files are processed only in this browser tab and are never sent anywhere.",
+      experimental: "A technical-validation prototype — the parser will need updates if the source schema changes.",
+      privacy: "Privacy policy",
+    },
+    deleteFlow: {
+      ctaAvailable: "Delete this service via Lethe",
+      ctaUnavailable: "I want this deleted too",
+      ctaRequested: "Requested",
+      newTabNote: "Opens a new draft in your mail app.",
+      mailtoFallbackIntro: "If your mail app doesn't open, copy the text below and send it yourself.",
+      copyButton: "Copy",
+      copyDone: "Copied",
+      mailtoSubject: (serviceName) => `[Personal Data Deletion Request] ${serviceName}`,
+      mailtoBody: (serviceName) =>
+        `Hello,\n\nUnder Article 36 of Korea's Personal Information Protection Act (right to request correction/deletion), I am requesting the deletion (destruction) of my account and personal data held by ${serviceName}.\n\nPlease confirm and let me know once this has been processed.\n\nThank you.`,
+      bulkButton: "Request all",
+      bulkModalTitle: "Choose services to request",
+      bulkModalBody: "These are the services Lethe can't delete for you yet. Pick the ones you'd like to request — the team will review and add support.",
+      bulkModalEmpty: "There's nothing to request right now.",
+      bulkModalConfirm: (count) => `Request ${count} selected service${count === 1 ? "" : "s"}`,
+      bulkModalCancel: "Cancel",
+    },
+  },
+  ja: {
+    hero: {
+      eyebrow: "Personal Data Ledger",
+      title: "自分の個人情報、どこにどれだけ残っているか",
+      body: "LetheはKakao・Naverの個人情報現況ファイルをブラウザ内だけで分析します。サーバーには送信されず、更新するとすべてのデータが消えます。",
+    },
+    cta: { start: "始める — ファイルをアップロード", howTo: "ファイルの準備方法を見る" },
+    trust: {
+      localTitle: "ローカル処理",
+      storageTitle: "保存なし",
+      storageBody: "localStorage・IndexedDBを使用しません。タブを閉じるとデータは即座に消滅します。",
+      opennessTitle: "開かれた分析",
+    },
+    howto: {
+      kakaoTitle: "Kakao",
+      kakaoSteps: [
+        "accounts.kakao.comにログイン → アカウント → 個人情報利用現況",
+        "「収集及び利用」「第三者提供」「処理委託」タブをそれぞれ開き、Cmd/Ctrl+Sで保存(計3ファイル)",
+      ],
+      naverTitle: "Naver",
+      naverSteps: [
+        "nid.naver.comで連携サービス管理ページを保存(一覧のみキャプチャ)",
+        "より正確にするには: 開発者ツールのNetworkタブ → ページ再読み込み → 右クリック → 「Save all as HAR」で丸ごと保存",
+      ],
+    },
+    dropzone: {
+      main: "ここにファイルをドロップしてください",
+      sub: "Kakao HTML 3種(収集及び利用/第三者提供/処理委託)・Naver HTML・Naver HAR/JSON — 複数同時可",
+      privacyNote: "サーバーには送信されません · このブラウザタブ内でのみ処理されます",
+    },
+    formats: {
+      kakaoTitle: "Kakao個人情報現況",
+      kakaoDesc: "個人情報利用現況ページをHTMLで保存したファイル (.html)",
+      naverTitle: "Naver連携サービス",
+      naverDesc: "Naverアカウント設定から書き出したHTML保存版、またはHARファイル (.html / .har)",
+      unsupportedNote: "サポート外のファイル形式をアップロードすると、認識失敗の案内と保存方法が表示されます。",
+    },
+    preStart: {
+      title: "始める前にご確認ください",
+      body: "このツールは登録・連携当時に同意した項目のスナップショットを分析します。リアルタイムの収集内容ではない場合があります。",
+      legalNote: "分析結果に法的効力はなく、参考情報です。",
+      privacyLink: "プライバシーポリシーを確認",
+    },
+    progress: {
+      reading: "ファイルを読み込み中",
+      parsing: "分析中",
+      scoring: "リスクを採点中",
+      done: "完了",
+    },
+    errors: {
+      harUnrecognized: "HARファイル内で連携サービスのデータが見つかりませんでした。連携サービスページを再読み込みしてから再度書き出してください。",
+      fileTypeUnrecognized: "このファイル形式は認識できませんでした。対応形式(.html/.htm/.json/.har)をご確認ください。",
+    },
+    disclaimer: {
+      snapshot: "このデータは登録・連携当時に同意した項目のスナップショットです。",
+      scoreMeaning: "スコアは企業の信頼度ではなく、情報が流出した場合の深刻さを表します。",
+    },
+    tabs: {
+      naver: "Naver連携サービス",
+      kakao: "Kakao連携サービス",
+      kakaoCollect: "収集及び利用",
+      kakaoCollectExtra: "収集及び利用 – 付加情報(用途未確認)",
+      kakaoProvider: "処理委託",
+      generic: "連携サービス一覧",
+    },
+    summary: {
+      serviceCount: "登録・連携済みサービス数",
+      sensitiveCount: "機微情報保有サービス数",
+      comparableTag: "外部提供型 · 他プラットフォームと比較可能",
+      platformOnlyTag: "プラットフォーム自社保有型 · 他プラットフォームと直接比較不可",
+      noScoreNote: "このタブは項目単位のデータがないため採点対象外です。",
+    },
+    toolbar: { searchPlaceholder: "サービス名で検索…", sortButton: "リスクが高い順" },
+    methodology: {
+      summary: "このリスクスコアはどう計算されているか (v1草案)",
+      intro:
+        "収集・提供される項目テキストを15カテゴリに分類し、カテゴリごとの重みを合算して0〜100点に正規化します。第三者提供項目は1.3倍加重し、氏名・生年月日・連絡先・住所のうち3つ以上が同時に使われる場合は再識別リスクのボーナスを加算します。法的に検証された基準ではなく、優先順位付けのためのv1ヒューリスティック草案です。",
+    },
+    rows: {
+      whyScore: (count, hasStale) => `なぜ${count}個の要素${hasStale ? " + 放置加算" : ""}なのか`,
+      comboNote: "氏名・生年月日・連絡先・住所のうち3つ以上が揃っているため、追加加算されました。",
+      staleNote: (days) => `最終利用日から約${days}日経過 — 長期間放置された連携は悪用に気づきにくいため、リスクを加算しました。`,
+      cleanupBadge: (days) => `整理候補 · ${days}日未使用`,
+      emptyResult: "結果がありません",
+    },
+    report: {
+      button: "要約レポートを作成 (A4 1枚)",
+      print: "印刷 / PDFとして保存",
+      close: "閉じる",
+      title: "個人情報露出状況レポート",
+      generatedAt: (date) => `生成日時: ${date} · Personal Data Ledger v1 (実験的機能)`,
+      overview: "概要",
+      tableHead: { tab: "タブ(プラットフォーム)", serviceCount: "サービス数", sensitiveCount: "機微情報保有(60点以上)" },
+      topRisk: "最も注意が必要なサービス",
+      topRiskHead: { name: "サービス名", tab: "タブ", score: "スコア", items: "主な露出項目" },
+      cleanup: "整理候補(長期間放置された連携)",
+      cleanupNone: "現時点で整理候補は見つかりませんでした。",
+      categories: "多く露出している情報タイプ",
+      categoriesNone: "集計できる採点データがありません。",
+      recommendations: "今後の改善方向",
+      recHigh: (count) => `機微情報(60点以上)を保有するサービスが計${count}件あります。実際に使用しているか一つずつ確認し、使わないものは連携を解除してください。`,
+      recCleanup: (count) => `${count}件以上のサービスが長期間(91日以上)未使用です。スコアに関わらず整理の最優先対象です。`,
+      recReident: (count) => `${count}件のサービスがCI/DIなどの相互識別情報を保有しています。これらのサービスはアカウントセキュリティ(2段階認証など)を特に強化してください。`,
+      recFinance: (count) => `${count}件のサービスが金融・決済情報を保有しています。振込・少額決済の通知をオンにしておくと異常な取引に早く気づけます。`,
+      recSnapshot: "本レポートは登録・連携時点で同意した項目のスナップショットです。実際のサービス利用中に直接入力した配送先・決済手段などは含まれない場合があります。",
+      recScoreMeaning: "スコアは情報の機微度(露出時の危険度)のみを示し、企業のセキュリティ水準を評価するものではありません。優先順位を決めるための道具としてのみご活用ください。",
+      footNote: "本レポートは個人検証用の実験的プロトタイプとして生成されたものであり、法的に検証された個人情報リスク評価ではありません。ブラウザ内でローカルに分析された結果であり、外部には送信されていません。",
+    },
+    footer: {
+      local: "アップロードしたファイルはこのブラウザタブ内でのみ処理され、外部には送信されません。",
+      experimental: "技術検証用プロトタイプ — スキーマが変わるとパーサーの更新が必要です。",
+      privacy: "プライバシーポリシー",
+    },
+    deleteFlow: {
+      ctaAvailable: "Letheで該当サービスを退会・情報削除する",
+      ctaUnavailable: "これも削除したい",
+      ctaRequested: "申請済み",
+      newTabNote: "メールアプリで新しい下書きが開きます。",
+      mailtoFallbackIntro: "メールアプリが開かない場合は、以下の内容をコピーしてご自身で送信してください。",
+      copyButton: "コピー",
+      copyDone: "コピーしました",
+      mailtoSubject: (serviceName) => `【個人情報削除依頼】${serviceName}`,
+      mailtoBody: (serviceName) =>
+        `こんにちは。\n\n韓国の個人情報保護法第36条(個人情報の訂正・削除等)に基づき、${serviceName}に連携されている私のアカウントおよび個人情報の削除(破棄)を依頼いたします。\n\nご確認の上、対応結果をご返信いただけますと幸いです。\n\nよろしくお願いいたします。`,
+      bulkButton: "一括申請",
+      bulkModalTitle: "申請するサービスを選択",
+      bulkModalBody: "現在Letheで削除を進められないサービスの一覧です。申請したいサービスを選んでください — チームが確認の上、対応対象に追加します。",
+      bulkModalEmpty: "現在申請できるサービスはありません。",
+      bulkModalConfirm: (count) => `選択した${count}件のサービスを申請する`,
+      bulkModalCancel: "キャンセル",
+    },
+  },
+};
