@@ -31,6 +31,13 @@ export default function HeroSection() {
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,20,30,0.28),rgba(7,20,30,0.46)_52%,rgba(7,20,30,0.76))]" />
 
       <div className="relative z-10 text-center text-white px-6 select-none">
+        <p
+          className="mb-5 text-xs tracking-[0.38em] text-white/42 animate-fade-in-slow md:text-sm"
+          style={{ animationDelay: "0.05s", opacity: 0 }}
+        >
+          {t.hero.pronunciation}
+        </p>
+
         <h1
           className="font-display font-light tracking-[0.3em] text-7xl md:text-9xl mb-8 animate-fade-in-slow"
           style={{ animationDelay: "0.2s", opacity: 0 }}

@@ -210,7 +210,7 @@ export default function ServiceIntroSection() {
         </div>
       </div>
 
-      <section className="relative overflow-hidden bg-[#0b1e29] text-white">
+      <section data-product-cta="question" className="relative overflow-hidden bg-[#0b1e29] text-white">
         <Image
           src="/images/feature-1.jpg"
           alt=""
@@ -303,6 +303,40 @@ export default function ServiceIntroSection() {
           </div>
         </div>
       </div>
+
+      <section
+        data-product-cta="detail"
+        className="border-t border-stone-200 bg-[#fbfaf7]"
+      >
+        <div className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
+          <FadeInWhenVisible>
+            <div className="grid gap-10 md:grid-cols-[0.58fr_1fr] md:items-end">
+              <span className="text-[10px] tracking-[0.35em] uppercase text-fog">
+                {t.productCta.label}
+              </span>
+              <div>
+                <h2 className="font-display font-light text-4xl leading-[1.14] text-slate-800 md:text-6xl whitespace-pre-line">
+                  {t.productCta.heading}
+                </h2>
+                <p className="mt-7 max-w-2xl text-base leading-8 text-slate-500 md:text-lg">
+                  {t.productCta.body}
+                </p>
+                <div className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+                  <a
+                    href="/notes/understanding-me-myself"
+                    className="inline-flex min-h-12 items-center justify-center border border-slate-800 bg-slate-800 px-8 py-4 text-xs tracking-[0.18em] text-white transition-all duration-300 hover:bg-slate-700 hover:shadow-[0_18px_42px_rgba(35,48,58,0.14)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-800 focus-visible:outline-offset-4"
+                  >
+                    {t.productCta.button}
+                  </a>
+                  <p className="max-w-md text-xs leading-6 text-slate-400">
+                    {t.productCta.note}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </FadeInWhenVisible>
+        </div>
+      </section>
     </section>
   );
 }

@@ -3,11 +3,12 @@ export type Locale = "ko" | "en" | "ja";
 export const translations = {
   ko: {
     nav: {
-      cta: "인터뷰 참여하기",
+      cta: "가입한 서비스 살펴보기",
       privacy: "쓰는 정보",
     },
     hero: {
       title: "LETHE",
+      pronunciation: "[ 레 테 ]",
       sub1: "고요히 흘려보내다.",
     },
     story: {
@@ -98,10 +99,18 @@ export const translations = {
       heading: "모든 사람이 자신의\n디지털 삶을 자유롭게\n정리할 수 있는 세상",
       body: "불안감 없이. 기술 용어 없이. 그저 고요하게.",
     },
+    productCta: {
+      label: "첫 번째 행동",
+      heading: "고요한 수면에 잠시\n나를 비추어 본다면—",
+      body: "시간이 바빠서, 어디서부터 시작해야 할지 몰랐던 막연함은 Lethe가 흘려보내겠습니다. 내 정보가 어디에 남아 있는지 차분히 이해하는 시간을 가져보세요.",
+      button: "가입한 서비스 살펴보기",
+      note: "파일은 서버로 전송되지 않고, 이 브라우저 탭 안에서만 처리됩니다.",
+      floating: "가입한 서비스 살펴보기",
+    },
     cta: {
-      label: "인터뷰 참여",
+      label: "함께 만들기",
       heading: "모든 흐름에는\n시작이 있습니다.",
-      body: "당신의 경험이 Lethe의 첫 흐름이 됩니다.",
+      body: "당신의 경험과 의견은, Lethe를 이루는 하나의 물결입니다.",
       perks: [
         "탈퇴했는데도 정보가 남아있는 줄 몰랐어요.",
         "어디에 가입했는지 기억도 잘 안 났어요.",
@@ -126,7 +135,7 @@ export const translations = {
           linkText: "생각보다 긴 여정이 시작되었습니다.",
         },
       ],
-      button: "인터뷰 신청하기",
+      button: "서비스 개선에 참여하기",
       note: "*약 30분 소요.",
       transparency: {
         heading: "Lethe는 이 페이지에서 인터뷰 신청에 필요한 정보만 사용합니다.",
@@ -241,11 +250,12 @@ export const translations = {
 
   en: {
     nav: {
-      cta: "Join the Interview",
+      cta: "Review Joined Services",
       privacy: "Data We Use",
     },
     hero: {
       title: "LETHE",
+      pronunciation: "[ ˈliːθi ]",
       sub1: "As the river carries it away.",
     },
     story: {
@@ -336,10 +346,18 @@ export const translations = {
       heading: "A world where everyone\ncan freely and quietly\ncurate their digital life",
       body: "Without anxiety. Without technical jargon. Just calm clarity.",
     },
+    productCta: {
+      label: "First step",
+      heading: "If you paused by still waters,\nand caught a glimpse of yourself—",
+      body: "Lethe will help carry away the uncertainty that came from being busy, or not knowing where to begin. Take a quiet moment to see where your information may still remain.",
+      button: "Review Joined Services",
+      note: "Files are not sent to a server. They are processed only in this browser tab.",
+      floating: "Review Joined Services",
+    },
     cta: {
-      label: "Interview",
-      heading: "Every current\nhas a beginning.",
-      body: "Your experience becomes the first flow of Lethe.",
+      label: "Help Shape Lethe",
+      heading: "Lethe is still\nlearning the current.",
+      body: "Your experiences and insights are one of the currents that shape Lethe.",
       perks: [
         "I didn't know my information could remain after leaving.",
         "I couldn't remember where I had signed up.",
@@ -364,7 +382,7 @@ export const translations = {
           linkText: "A longer journey began.",
         },
       ],
-      button: "Apply for Interview",
+      button: "Help Improve Lethe",
       note: "* About 30 minutes.",
       transparency: {
         heading: "Lethe only uses the information needed for interview applications on this page.",
@@ -479,11 +497,12 @@ export const translations = {
 
   ja: {
     nav: {
-      cta: "インタビューに参加",
+      cta: "登録したサービスを見る",
       privacy: "使う情報",
     },
     hero: {
       title: "LETHE",
+      pronunciation: "[ レーテ ]",
       sub1: "川の流れのように。",
     },
     story: {
@@ -574,10 +593,18 @@ export const translations = {
       heading: "誰もが自分の\nデジタルライフを自由に\n整理できる世界へ",
       body: "不安なく。専門用語なく。ただ、静かに。",
     },
+    productCta: {
+      label: "最初の行動",
+      heading: "静かな水面にしばし佇み、\n自分を映してみたなら—",
+      body: "忙しくて、どこから始めればよいのか分からなかった漠然とした不安は、Letheが静かに流していきます。自分の情報がどこに残っているのか、落ち着いて整理する時間を持ってみてください。",
+      button: "登録したサービスを見る",
+      note: "ファイルはサーバーに送信されず、このブラウザタブ内でのみ処理されます。",
+      floating: "登録したサービスを見る",
+    },
     cta: {
-      label: "インタビュー",
-      heading: "すべての流れには\n始まりがあります。",
-      body: "あなたの経験が、Letheの最初の流れになります。",
+      label: "一緒につくる",
+      heading: "Letheはまだ\n流れを学んでいます。",
+      body: "あなたの経験や想いは、Letheを紡ぐひとつの流れです。",
       perks: [
         "退会後も情報が残るとは知りませんでした。",
         "どこに登録したのかも覚えていませんでした。",
@@ -602,7 +629,7 @@ export const translations = {
           linkText: "思ったより長い旅が始まりました。",
         },
       ],
-      button: "インタビューに申し込む",
+      button: "サービス改善に参加",
       note: "* 所要時間：約30分。",
       transparency: {
         heading: "Letheは、このページでインタビュー申込に必要な情報だけを使用します。",
