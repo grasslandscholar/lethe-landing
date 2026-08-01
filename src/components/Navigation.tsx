@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Locale } from "@/i18n/translations";
 import { openPrivacyModal } from "./PrivacyModal";
+import { trackAnalysisCtaClicked } from "./LandingAnalytics";
 
 const LOCALES: { code: Locale; label: string }[] = [
   { code: "ko", label: "KO" },
@@ -91,6 +92,7 @@ export default function Navigation({ forceScrolled = false }: NavigationProps) {
           {/* CTA */}
           <a
             href={ctaHref}
+            onClick={() => trackAnalysisCtaClicked("hero")}
             className={`hidden md:flex items-center text-xs tracking-widest px-5 py-2.5 border transition-all duration-300 ${
               scrolled
                 ? "border-slate-700 text-slate-700 hover:bg-slate-700 hover:text-white"

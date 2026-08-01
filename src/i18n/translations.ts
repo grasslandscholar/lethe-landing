@@ -104,7 +104,7 @@ export const translations = {
       heading: "고요한 수면에 잠시\n나를 비추어 본다면—",
       body: "시간이 바빠서, 어디서부터 시작해야 할지 몰랐던 막연함은 Lethe가 흘려보내겠습니다. 내 정보가 어디에 남아 있는지 차분히 이해하는 시간을 가져보세요.",
       button: "가입한 서비스 살펴보기",
-      note: "파일은 서버로 전송되지 않고, 이 브라우저 탭 안에서만 처리됩니다.",
+      note: "데이터가 저장되지 않으며, 새로고침과 함께 모두 사라집니다.",
       floating: "가입한 서비스 살펴보기",
     },
     cta: {
@@ -207,39 +207,78 @@ export const translations = {
           "수집된 정보는 인터뷰 진행과 Lethe 연구·개발을 위해 사용됩니다.",
           "삭제를 요청하면 관련 정보는 삭제됩니다.",
         ],
+        sections: [
+          {
+            title: "우리는 어떤 정보를 받을까요?",
+            body: "인터뷰를 신청하실 경우 아래 정보를 받을 수 있습니다.\n\n• 이름 또는 닉네임\n• 이메일 주소\n• 신청 과정에서 직접 작성한 내용\n\n또한 서비스를 더 편리하게 만들기 위해 페이지 방문이나 버튼 클릭과 같은 비식별 이용 통계를 확인할 수 있습니다.\n\n다만 업로드한 파일의 내용이나 분석 결과는 Lethe 서버에 저장되지 않습니다.",
+          },
+          {
+            title: "왜 필요한가요?",
+            body: "수집한 정보는 다음과 같은 목적으로만 사용됩니다.\n\n• 인터뷰 진행\n• 서비스 개선\n• 연구 및 개발\n• 서비스 이용 현황 분석",
+          },
+          {
+            title: "업로드한 파일은 어떻게 처리되나요?",
+            body: "Lethe는 업로드한 파일을 브라우저 안에서만 분석합니다.\n\n• 파일은 Lethe 서버로 전송되지 않습니다.\n• 분석 결과도 서버에 저장되지 않습니다.\n• 페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다.",
+          },
+          {
+            title: "정보는 얼마나 보관하나요?",
+            body: "인터뷰를 위해 받은 개인정보는 필요한 기간 동안만 보관합니다.\n\n다음과 같은 경우에는 지체 없이 삭제합니다.\n\n• 연구가 종료된 경우\n• 삭제를 요청한 경우\n• 관련 법령에 따른 보관 기간이 끝난 경우",
+          },
+          {
+            title: "외부 서비스를 이용하나요?",
+            body: "서비스 운영을 위해 아래 서비스를 사용할 수 있습니다.\n\n• Google Forms\n• Google Calendar\n• Calendly\n\n필요한 정보는 각 서비스의 정책에 따라 처리될 수 있습니다.",
+          },
+          {
+            title: "내 정보를 확인하거나 삭제할 수 있나요?",
+            body: "물론입니다.\n\n언제든지 아래 내용을 요청하실 수 있습니다.\n\n• 내 정보 열람\n• 정보 수정\n• 정보 삭제\n\n문의는 아래 이메일로 보내주세요.\n\nconnect.lethe@gmail.com",
+          },
+          {
+            title: "이 방침은 바뀔 수 있나요?",
+            body: "서비스가 발전하거나 관련 법령이 변경되면 이 개인정보처리방침도 함께 수정될 수 있습니다.\n\n변경 사항은 이 페이지에서 안내드립니다.",
+          },
+        ],
         contactTitle: "문의",
         contact: "connect.lethe@gmail.com",
       },
       detail: {
         heading: "개인정보처리방침",
-        updated: "최종 수정일: 2026.06.23",
+        updated: "시행일: 2026.08.01",
         sections: [
           {
-            title: "수집하는 정보",
-            items: ["이름 또는 닉네임", "이메일 주소", "인터뷰 신청 과정에서 사용자가 직접 작성한 내용"],
+            title: "개요",
+            body: "Lethe(이하 \"서비스\")는 이용자의 개인정보를 소중하게 생각하며, 개인정보 보호 관련 법령을 준수하기 위해 노력합니다.",
           },
           {
-            title: "정보를 사용하는 이유",
-            items: ["인터뷰 일정 조율", "사용자 경험 및 의견 수집", "서비스 연구 및 개발"],
+            title: "1. 수집하는 개인정보",
+            body: "서비스는 다음의 개인정보를 수집할 수 있습니다.\n\n인터뷰 신청 시\n• 이름 또는 닉네임\n• 이메일 주소\n• 이용자가 직접 작성한 신청 내용\n\n서비스 이용 시\n서비스 개선과 사용성 분석을 위해 페이지 이용에 관한 비식별 이용 통계를 수집할 수 있습니다. 여기에는 페이지 방문, 버튼 클릭, 분석 시작 및 완료 여부 등 서비스 이용 과정에서 발생하는 정보가 포함될 수 있습니다.\n\n업로드한 파일의 내용, 분석 결과, 가입한 서비스 정보 등 개인정보는 Lethe 서버에 저장되지 않습니다.",
           },
           {
-            title: "보관 기간",
-            body: "수집된 정보는 연구 및 인터뷰 진행을 위해 보관되며, 아래의 경우 지체 없이 삭제됩니다.",
-            items: ["연구 목적이 달성된 경우", "이용자가 삭제를 요청한 경우"],
+            title: "2. 개인정보 이용 목적",
+            body: "수집한 정보는 다음의 목적에 한하여 이용됩니다.",
+            items: ["인터뷰 일정 조율", "서비스 연구 및 개발", "사용자 경험 개선", "서비스 이용 현황 분석"],
           },
           {
-            title: "제3자 제공",
-            body: "현재 Lethe는 인터뷰 진행과 연구·개발에 필요한 범위 안에서 정보를 사용합니다. 외부 서비스 이용 과정에서 필요한 정보가 해당 서비스에 전달될 수 있습니다.",
+            title: "3. 브라우저 내 분석",
+            body: "Lethe의 분석 기능은 이용자가 업로드한 파일을 브라우저 안에서만 분석합니다.",
+            items: ["업로드한 파일은 Lethe 서버로 전송되지 않습니다.", "분석 결과는 Lethe 서버에 저장되지 않습니다.", "페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다."],
           },
           {
-            title: "외부 서비스 이용",
-            body: "인터뷰 신청 및 일정 조율 과정에서 아래와 같은 외부 서비스를 사용할 수 있습니다. 해당 서비스 이용 과정에서 필요한 정보가 해당 서비스에 전달될 수 있습니다.",
-            items: ["Google Forms", "Google Calendar", "Calendly"],
+            title: "4. 개인정보 보관 기간",
+            body: "인터뷰 신청을 위해 수집된 개인정보는 연구 및 인터뷰 진행을 위해 필요한 기간 동안만 보관하며, 다음의 경우 지체 없이 삭제합니다.",
+            items: ["연구 목적이 달성된 경우", "이용자가 삭제를 요청한 경우", "관련 법령에 따라 보관 의무가 종료된 경우"],
           },
           {
-            title: "이용자의 권리",
-            body: "이용자는 언제든지 자신의 정보에 대해 아래 요청을 할 수 있습니다.",
-            items: ["열람", "수정", "삭제"],
+            title: "5. 외부 서비스 이용",
+            body: "서비스 운영을 위해 다음과 같은 외부 서비스를 사용할 수 있습니다.\n\n• Google Forms\n• Google Calendar\n• Calendly\n\n서비스 이용 과정에서 필요한 정보는 해당 서비스의 정책에 따라 처리될 수 있습니다.",
+          },
+          {
+            title: "6. 이용자의 권리",
+            body: "이용자는 언제든지 자신의 개인정보에 대해 다음을 요청할 수 있습니다.",
+            items: ["열람", "정정", "삭제"],
+          },
+          {
+            title: "7. 개인정보처리방침의 변경",
+            body: "본 개인정보처리방침은 서비스의 변경 또는 관련 법령의 개정에 따라 수정될 수 있습니다. 변경 사항은 본 페이지를 통해 안내합니다.",
           },
         ],
         contactTitle: "문의",
@@ -351,7 +390,7 @@ export const translations = {
       heading: "If you paused by still waters,\nand caught a glimpse of yourself—",
       body: "Lethe will help carry away the uncertainty that came from being busy, or not knowing where to begin. Take a quiet moment to see where your information may still remain.",
       button: "Review Joined Services",
-      note: "Files are not sent to a server. They are processed only in this browser tab.",
+      note: "No data is stored, and everything disappears when you refresh.",
       floating: "Review Joined Services",
     },
     cta: {
@@ -453,6 +492,36 @@ export const translations = {
         after: [
           "Collected information is used to run interviews and for Lethe research and development.",
           "If you ask us to delete it, the related information will be deleted.",
+        ],
+        sections: [
+          {
+            title: "What information do we receive?",
+            body: "If you apply for an interview, we may receive the following information.\n\n• Name or nickname\n• Email address\n• Information you write during the application process\n\nWe may also review non-identifying usage analytics, such as page visits or button clicks, to make the service easier to use.\n\nHowever, the contents of uploaded files and analysis results are not stored on Lethe servers.",
+          },
+          {
+            title: "Why do we need it?",
+            body: "Collected information is used only for the following purposes.\n\n• Running interviews\n• Improving the service\n• Research and development\n• Understanding service usage",
+          },
+          {
+            title: "How are uploaded files handled?",
+            body: "Lethe analyzes uploaded files only inside your browser.\n\n• Files are not sent to Lethe servers.\n• Analysis results are not stored on the server.\n• When you refresh or close the page, all analysis data disappears.",
+          },
+          {
+            title: "How long is information kept?",
+            body: "Personal information received for interviews is kept only for as long as needed.\n\nIt is deleted without delay in the following cases.\n\n• When the research has ended\n• When deletion is requested\n• When any legally required retention period has ended",
+          },
+          {
+            title: "Do we use external services?",
+            body: "We may use the following services to operate Lethe.\n\n• Google Forms\n• Google Calendar\n• Calendly\n\nNecessary information may be processed according to each service's own policy.",
+          },
+          {
+            title: "Can I view or delete my information?",
+            body: "Yes.\n\nYou may request the following at any time.\n\n• Access to your information\n• Correction of information\n• Deletion of information\n\nPlease contact us at the email address below.\n\nconnect.lethe@gmail.com",
+          },
+          {
+            title: "Can this policy change?",
+            body: "As the service develops or relevant laws change, this Privacy Policy may also be updated.\n\nChanges will be announced on this page.",
+          },
         ],
         contactTitle: "Contact",
         contact: "connect.lethe@gmail.com",
@@ -598,7 +667,7 @@ export const translations = {
       heading: "静かな水面にしばし佇み、\n自分を映してみたなら—",
       body: "忙しくて、どこから始めればよいのか分からなかった漠然とした不安は、Letheが静かに流していきます。自分の情報がどこに残っているのか、落ち着いて整理する時間を持ってみてください。",
       button: "登録したサービスを見る",
-      note: "ファイルはサーバーに送信されず、このブラウザタブ内でのみ処理されます。",
+      note: "データは保存されず、ページを更新するとすべて消えます。",
       floating: "登録したサービスを見る",
     },
     cta: {
@@ -700,6 +769,36 @@ export const translations = {
         after: [
           "収集された情報はインタビュー進行とLetheの研究・開発のために使用されます。",
           "削除を依頼した場合、関連情報は削除されます。",
+        ],
+        sections: [
+          {
+            title: "どのような情報を受け取りますか？",
+            body: "インタビューに申し込む場合、以下の情報を受け取ることがあります。\n\n• 名前またはニックネーム\n• メールアドレス\n• 申込過程で直接記入した内容\n\nまた、サービスをより使いやすくするため、ページ訪問やボタンのクリックなど、個人を特定しない利用統計を確認することがあります。\n\nただし、アップロードしたファイルの内容や分析結果はLetheのサーバーに保存されません。",
+          },
+          {
+            title: "なぜ必要ですか？",
+            body: "収集した情報は、以下の目的に限って使用されます。\n\n• インタビューの進行\n• サービス改善\n• 研究および開発\n• サービス利用状況の分析",
+          },
+          {
+            title: "アップロードしたファイルはどう処理されますか？",
+            body: "Letheはアップロードしたファイルをブラウザ内だけで分析します。\n\n• ファイルはLetheのサーバーに送信されません。\n• 分析結果もサーバーに保存されません。\n• ページを更新または終了すると、分析データはすべて消えます。",
+          },
+          {
+            title: "情報はどのくらい保管されますか？",
+            body: "インタビューのために受け取った個人情報は、必要な期間だけ保管されます。\n\n以下の場合には遅滞なく削除されます。\n\n• 研究が終了した場合\n• 削除を依頼した場合\n• 関連法令に基づく保管期間が終了した場合",
+          },
+          {
+            title: "外部サービスを利用しますか？",
+            body: "サービス運営のため、以下のサービスを利用することがあります。\n\n• Google Forms\n• Google Calendar\n• Calendly\n\n必要な情報は、各サービスのポリシーに従って処理される場合があります。",
+          },
+          {
+            title: "自分の情報を確認したり削除したりできますか？",
+            body: "もちろんです。\n\nいつでも以下を依頼できます。\n\n• 自分の情報の閲覧\n• 情報の修正\n• 情報の削除\n\nお問い合わせは以下のメールアドレスまでお送りください。\n\nconnect.lethe@gmail.com",
+          },
+          {
+            title: "この方針は変更されることがありますか？",
+            body: "サービスの発展や関連法令の変更により、このプライバシーポリシーも更新される場合があります。\n\n変更事項はこのページでお知らせします。",
+          },
         ],
         contactTitle: "お問い合わせ",
         contact: "connect.lethe@gmail.com",

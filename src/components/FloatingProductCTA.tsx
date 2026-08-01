@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { trackAnalysisCtaClicked } from "./LandingAnalytics";
 
 export default function FloatingProductCTA() {
   const { t } = useLanguage();
@@ -52,6 +53,7 @@ export default function FloatingProductCTA() {
   return (
     <a
       href="/notes/understanding-me-myself"
+      onClick={() => trackAnalysisCtaClicked("floating")}
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
       className={`group fixed bottom-6 right-5 z-40 hidden h-12 items-center overflow-hidden border border-slate-300/70 bg-[#fbfaf7]/88 text-[11px] tracking-[0.16em] text-slate-700 shadow-[0_16px_42px_rgba(35,48,58,0.12)] backdrop-blur-md transition-all duration-700 md:inline-flex ${

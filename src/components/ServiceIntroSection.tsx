@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
+import { trackAnalysisCtaClicked } from "./LandingAnalytics";
 import type { Translations } from "@/i18n/translations";
 import FadeInWhenVisible from "./FadeInWhenVisible";
 
@@ -309,11 +310,25 @@ export default function ServiceIntroSection() {
         className="border-t border-stone-200 bg-[#fbfaf7]"
       >
         <div className="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
-          <FadeInWhenVisible>
-            <div className="grid gap-10 md:grid-cols-[0.58fr_1fr] md:items-end">
-              <span className="text-[10px] tracking-[0.35em] uppercase text-fog">
-                {t.productCta.label}
-              </span>
+          <div className="grid gap-14 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-24">
+            <FadeInWhenVisible>
+              <div className="relative">
+                <span className="mb-8 block text-[10px] tracking-[0.35em] uppercase text-fog md:absolute md:-top-12 md:left-0 md:mb-0">
+                  {t.productCta.label}
+                </span>
+                <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
+                  <Image
+                    src="/images/River-CTA1.jpg"
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 45vw"
+                  />
+                </div>
+              </div>
+            </FadeInWhenVisible>
+
+            <FadeInWhenVisible delay={140}>
               <div>
                 <h2 className="font-display font-light text-4xl leading-[1.14] text-slate-800 md:text-6xl whitespace-pre-line">
                   {t.productCta.heading}
@@ -324,6 +339,7 @@ export default function ServiceIntroSection() {
                 <div className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
                   <a
                     href="/notes/understanding-me-myself"
+                    onClick={() => trackAnalysisCtaClicked("section")}
                     className="inline-flex min-h-12 items-center justify-center border border-slate-800 bg-slate-800 px-8 py-4 text-xs tracking-[0.18em] text-white transition-all duration-300 hover:bg-slate-700 hover:shadow-[0_18px_42px_rgba(35,48,58,0.14)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-800 focus-visible:outline-offset-4"
                   >
                     {t.productCta.button}
@@ -333,8 +349,8 @@ export default function ServiceIntroSection() {
                   </p>
                 </div>
               </div>
-            </div>
-          </FadeInWhenVisible>
+            </FadeInWhenVisible>
+          </div>
         </div>
       </section>
     </section>

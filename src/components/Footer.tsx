@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { openPrivacyModal } from "./PrivacyModal";
+import { trackAnalysisCtaClicked } from "./LandingAnalytics";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -23,6 +24,9 @@ export default function Footer() {
         </div>
         <div className="flex flex-col md:items-end gap-4">
           <div className="flex items-center gap-6 text-xs tracking-wide">
+            <a href="/notes/understanding-me-myself" onClick={() => trackAnalysisCtaClicked("footer")} className="transition-colors hover:text-white/75">
+              {t.productCta.button}
+            </a>
             <button type="button" onClick={openPrivacyModal} className="transition-colors hover:text-white/75">
               {t.footer.privacy}
             </button>

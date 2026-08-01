@@ -97,33 +97,21 @@ export default function PrivacyModal() {
         <div className="max-h-[55vh] overflow-y-auto px-6 py-7 md:px-8">
           {tab === "easy" ? (
             <div className="space-y-6 text-sm leading-7 text-slate-600">
-              {t.privacy.easy.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-
-              <section>
-                <h3 className="text-xs tracking-[0.22em] text-slate-400">
-                  {t.privacy.easy.collectedTitle}
+              <div>
+                <h3 className="font-display text-2xl font-light text-slate-800">
+                  {t.privacy.detail.heading}
                 </h3>
-                <ul className="mt-3 space-y-2">
-                  {t.privacy.easy.collected.map((item) => (
-                    <li key={item}>• {item}</li>
-                  ))}
-                </ul>
-              </section>
+                <p className="mt-2 text-xs text-slate-400">{t.privacy.detail.updated}</p>
+              </div>
 
-              {t.privacy.easy.after.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+              {t.privacy.easy.sections.map((section) => (
+                <section key={section.title} className="border-t border-stone-200 pt-5">
+                  <h4 className="text-xs tracking-[0.22em] text-slate-400">
+                    {section.title}
+                  </h4>
+                  <p className="mt-3 whitespace-pre-line">{section.body}</p>
+                </section>
               ))}
-
-              <section className="border-t border-stone-200 pt-5">
-                <h3 className="text-xs tracking-[0.22em] text-slate-400">
-                  {t.privacy.easy.contactTitle}
-                </h3>
-                <a className="mt-2 inline-flex text-slate-700 hover:text-slate-950" href={`mailto:${t.privacy.easy.contact}`}>
-                  {t.privacy.easy.contact}
-                </a>
-              </section>
             </div>
           ) : (
             <div className="space-y-7 text-sm leading-7 text-slate-600">
@@ -139,7 +127,7 @@ export default function PrivacyModal() {
                   <h4 className="text-xs tracking-[0.22em] text-slate-400">
                     {section.title}
                   </h4>
-                  {"body" in section ? <p className="mt-3">{section.body}</p> : null}
+                  {"body" in section ? <p className="mt-3 whitespace-pre-line">{section.body}</p> : null}
                   {"items" in section ? (
                     <ul className="mt-3 space-y-2">
                       {section.items.map((item) => (

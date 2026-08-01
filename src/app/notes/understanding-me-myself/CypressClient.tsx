@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { openPrivacyModal } from "@/components/PrivacyModal";
 import PrivacyModal from "@/components/PrivacyModal";
@@ -16,10 +16,119 @@ import type { NormalizedRow, TabDataset } from "@/lib/cypress/types";
 
 type Dataset = Partial<Record<CategoryId, TabDataset>>;
 type PlatformTab = "kakao" | "naver" | "generic";
+type CleanupStep = "results" | "thanks";
 
 const SCORED_CATEGORIES: CategoryId[] = ["kakao", "kakao_collect", "kakao_collect_extra", "naver", "generic"];
 const COMPARABLE_CATEGORIES: CategoryId[] = ["kakao", "naver"];
 const HIGH_RISK_THRESHOLD = 60;
+const CLEANUP_KEY_SEPARATOR = "\u001f";
+
+function providerFromCategories(categories: ParsedCategory[]): PlatformTab | "mixed" | "unknown" {
+  const providers = new Set<PlatformTab>();
+  categories.forEach((cat) => {
+    if (cat.id.startsWith("kakao")) providers.add("kakao");
+    else if (cat.id === "naver") providers.add("naver");
+    else providers.add("generic");
+  });
+  if (providers.size === 0) return "unknown";
+  if (providers.size > 1) return "mixed";
+  return [...providers][0];
+}
+
+function providerFromDataset(dataset: Dataset): PlatformTab | "mixed" | "unknown" {
+  return providerFromCategories(
+    (Object.keys(dataset) as CategoryId[]).flatMap((id) => {
+      const tab = dataset[id];
+      return tab ? [{ id, rows: tab.rows, source: tab.source, note: tab.note ?? undefined, mergeDedupe: false }] : [];
+    })
+  );
+}
+
+function providerFromText(text: string): PlatformTab | "unknown" {
+  const lower = text.toLowerCase();
+  if (lower.includes("kakao") || lower.includes("카카오") || lower.includes("privacyinfos")) return "kakao";
+  if (lower.includes("naver") || lower.includes("네이버") || lower.includes("token_list")) return "naver";
+  return "unknown";
+}
+
+function providerFromReadResults(results: ({ text: string; name: string } | null)[]): PlatformTab | "mixed" | "unknown" {
+  const providers = new Set<PlatformTab>();
+  results.forEach((result) => {
+    if (!result) return;
+    const provider = providerFromText(result.text);
+    if (provider !== "unknown") providers.add(provider);
+  });
+  if (providers.size === 0) return "unknown";
+  if (providers.size > 1) return "mixed";
+  return [...providers][0];
+}
+
+function cleanupKeyForRow(categoryId: CategoryId, row: NormalizedRow, rowIndex: number) {
+  return [categoryId, rowIndex, row.serviceName, row.rawItemText].join(CLEANUP_KEY_SEPARATOR);
+}
+
+function serviceNameFromCleanupKey(key: string) {
+  return key.split(CLEANUP_KEY_SEPARATOR)[2] ?? key;
+}
+
+function gradeToneClass(cls: string) {
+  switch (cls) {
+    case "g5":
+      return "border-[#8f7768]/50 bg-[#eadfd8]/70 text-[#5d4035]";
+    case "g4":
+      return "border-[#b6a080]/55 bg-[#f0e6d5]/75 text-[#6b5738]";
+    case "g3":
+      return "border-[#91a5aa]/55 bg-[#e5eef0]/80 text-[#385862]";
+    case "g2":
+      return "border-[#aeb8a8]/60 bg-[#edf1e8]/80 text-[#52664b]";
+    default:
+      return "border-stone bg-[#f6f3ed] text-fog";
+  }
+}
+
+function categoryChipClass(id: string, active: boolean) {
+  const base = "rounded-full border px-3 py-1 font-mono text-[11px] transition-colors";
+  if (active) return `${base} border-slate bg-slate text-ivory`;
+  switch (id) {
+    case "reident":
+    case "finance":
+    case "location":
+      return `${base} border-[#b6a080]/55 bg-[#f0e6d5]/70 text-[#6b5738] hover:border-[#8f7768]`;
+    case "address":
+    case "phone":
+    case "email":
+      return `${base} border-[#91a5aa]/55 bg-[#e5eef0]/75 text-[#385862] hover:border-[#6f8c95]`;
+    case "behavior":
+    case "friends":
+      return `${base} border-[#aeb8a8]/60 bg-[#edf1e8]/75 text-[#52664b] hover:border-[#85947c]`;
+    default:
+      return `${base} border-stone bg-[#fbfaf7] text-fog hover:border-slate/45 hover:text-slate`;
+  }
+}
+
+function LinkifiedText({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/[^\s<>"']+)/g);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (!/^https?:\/\//.test(part)) return <span key={`${part}-${index}`}>{part}</span>;
+
+        const trailing = part.match(/[.,;:!?)]$/)?.[0] ?? "";
+        const href = trailing ? part.slice(0, -1) : part;
+
+        return (
+          <span key={`${href}-${index}`}>
+            <a href={href} target="_blank" rel="noopener noreferrer" className="text-slate underline decoration-stone underline-offset-2">
+              {href}
+            </a>
+            {trailing}
+          </span>
+        );
+      })}
+    </>
+  );
+}
 
 function applyScore(categoryId: CategoryId, r: NormalizedRow): NormalizedRow {
   if (!SCORED_CATEGORIES.includes(categoryId)) return r;
@@ -60,14 +169,21 @@ export default function CypressClient() {
   const [platformTabOverride, setPlatformTabOverride] = useState<PlatformTab | null>(null);
   const [kakaoSubTabOverride, setKakaoSubTabOverride] = useState<CategoryId | null>(null);
   const [search, setSearch] = useState("");
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string | null>(null);
   const [sortByRisk, setSortByRisk] = useState(false);
   const [stage, setStage] = useState<"idle" | "reading" | "parsing" | "done">("idle");
   const [errors, setErrors] = useState<(keyof CypressContent["errors"])[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [cleanupStep, setCleanupStep] = useState<CleanupStep>("results");
+  const [cleanupMode, setCleanupMode] = useState(false);
+  const [cleanupSelected, setCleanupSelected] = useState<Set<string>>(new Set());
+  const [customServiceEnabled, setCustomServiceEnabled] = useState(false);
+  const [customService, setCustomService] = useState("");
   const [requested, setRequested] = useState<Set<string>>(new Set());
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cleanupSectionRef = useRef<HTMLElement>(null);
 
   const requestSingle = useCallback(
     (serviceName: string) => {
@@ -122,6 +238,9 @@ export default function CypressClient() {
 
     Promise.all(readers).then((results) => {
       setStage("parsing");
+      const startedAt = performance.now();
+      const startedProvider = providerFromReadResults(results);
+      track("analysis_started", { provider: startedProvider, file_count: files.length });
 
       const newErrors: (keyof CypressContent["errors"])[] = [];
       const parsedByFile: ParsedCategory[][] = [];
@@ -145,6 +264,9 @@ export default function CypressClient() {
       }
 
       if (parsedByFile.length) {
+        const parsedCategories = parsedByFile.flat();
+        const provider = providerFromCategories(parsedCategories);
+
         setDataset((prev) => {
           const next: Dataset = { ...prev };
           for (const categories of parsedByFile) {
@@ -168,9 +290,15 @@ export default function CypressClient() {
           }
           return next;
         });
+        track("analysis_completed", { provider, duration_ms: Math.round(performance.now() - startedAt) });
       }
 
-      if (newErrors.length) setErrors((prev) => [...prev, ...newErrors]);
+      if (newErrors.length) {
+        setErrors((prev) => [...prev, ...newErrors]);
+        newErrors.forEach((errorType) => {
+          track("analysis_failed", { provider: startedProvider, error_type: errorType });
+        });
+      }
       setStage("done");
     });
   }, []);
@@ -201,12 +329,16 @@ export default function CypressClient() {
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    let rows = q ? activeRows.filter((r) => r.serviceName.toLowerCase().includes(q)) : activeRows.slice();
+    let rows = activeRows.map((row, originalIndex) => ({ row, originalIndex }));
+    if (q) rows = rows.filter(({ row }) => row.serviceName.toLowerCase().includes(q));
+    if (activeCategoryFilter) {
+      rows = rows.filter(({ row }) => row.risk?.matched.some((m) => m.id === activeCategoryFilter));
+    }
     if (sortByRisk && activeHasRisk) {
-      rows = rows.slice().sort((a, b) => (b.risk?.score ?? 0) - (a.risk?.score ?? 0));
+      rows = rows.slice().sort((a, b) => (b.row.risk?.score ?? 0) - (a.row.risk?.score ?? 0));
     }
     return rows;
-  }, [activeRows, search, sortByRisk, activeHasRisk]);
+  }, [activeRows, search, activeCategoryFilter, sortByRisk, activeHasRisk]);
 
   const unavailableServices = useMemo(() => {
     const names = new Set<string>();
@@ -218,6 +350,37 @@ export default function CypressClient() {
     });
     return [...names];
   }, [dataset, requested]);
+
+  const openCleanupReview = () => {
+    track("cleanup_interest_clicked", { provider: providerFromDataset(dataset), language: locale });
+    setCleanupMode(true);
+    requestAnimationFrame(() => {
+      cleanupSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const toggleCleanupService = (cleanupKey: string) => {
+    setCleanupSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(cleanupKey)) next.delete(cleanupKey);
+      else next.add(cleanupKey);
+      return next;
+    });
+  };
+
+  const submitCleanupReview = () => {
+    const selectedServices = [...new Set([...cleanupSelected].map(serviceNameFromCleanupKey))];
+    const custom = customService.trim();
+    if (customServiceEnabled && custom) selectedServices.push(custom);
+
+    track("cleanup_priority_submitted", {
+      selected_services: JSON.stringify(selectedServices),
+      selected_count: selectedServices.length,
+      custom_service_added: Boolean(customServiceEnabled && custom),
+      language: locale,
+    });
+    setCleanupStep("thanks");
+  };
 
   const tabLabel = (id: CategoryId): string => {
     switch (id) {
@@ -235,6 +398,7 @@ export default function CypressClient() {
   };
 
   const openFilePicker = () => fileInputRef.current?.click();
+  const cleanupSelectionCount = cleanupSelected.size + (customServiceEnabled && customService.trim() ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-ivory text-slate">
@@ -243,7 +407,16 @@ export default function CypressClient() {
           <Link href="/" aria-label="Lethe home" className="relative block h-8 w-28 shrink-0 md:h-10 md:w-36">
             <Image src="/brand/textlogowB.svg" alt="Lethe" fill priority className="object-contain object-left" sizes="144px" />
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4 md:gap-6">
+            <button
+              type="button"
+              onClick={openPrivacyModal}
+              className="hidden min-h-[36px] items-center text-xs tracking-widest text-slate-400 transition-colors hover:text-slate md:flex"
+            >
+              {t.footer.privacy}
+            </button>
+
+            <div className="flex items-center gap-1">
             {(["ko", "en", "ja"] as const).map((code, i) => (
               <button
                 key={code}
@@ -256,6 +429,7 @@ export default function CypressClient() {
                 {code.toUpperCase()}
               </button>
             ))}
+            </div>
           </div>
         </div>
       </header>
@@ -265,7 +439,7 @@ export default function CypressClient() {
           <section className="mb-12">
             <p className="mb-3 font-mono text-xs tracking-[0.14em] text-fog uppercase">{t.hero.eyebrow}</p>
             <h1 className="max-w-2xl font-display text-3xl leading-tight md:text-4xl">{t.hero.title}</h1>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-fog">{t.hero.body}</p>
+            <p className="mt-4 max-w-xl whitespace-pre-line text-sm leading-7 text-fog">{t.hero.body}</p>
 
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <button
@@ -393,17 +567,26 @@ export default function CypressClient() {
                 >
                   {t.report.button}
                 </button>
-                {unavailableServices.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setBulkModalOpen(true)}
-                    className="border border-stone px-4 py-2 text-xs tracking-wide text-slate transition-colors hover:border-slate"
-                  >
-                    {t.deleteFlow.bulkButton}
-                  </button>
-                )}
               </div>
             </div>
+
+            <CleanupReviewSection
+              ref={cleanupSectionRef}
+              t={t}
+              mode={cleanupMode}
+              step={cleanupStep}
+              selected={cleanupSelected}
+              customServiceEnabled={customServiceEnabled}
+              customService={customService}
+              onStart={openCleanupReview}
+              onToggleCustom={() => setCustomServiceEnabled((value) => !value)}
+              onCustomServiceChange={setCustomService}
+              onSubmit={submitCleanupReview}
+              onBack={() => {
+                setCleanupStep("results");
+                setCleanupMode(false);
+              }}
+            />
 
             <div className="mt-6 flex gap-1 border-b border-stone">
               {(["kakao", "naver", "generic"] as PlatformTab[])
@@ -466,12 +649,28 @@ export default function CypressClient() {
                   .sort((a, b) => b[1] - a[1])
                   .map(([id, count]) => {
                     const cat = TAXONOMY.find((c) => c.id === id);
+                    const active = activeCategoryFilter === id;
                     return (
-                      <span key={id} className="rounded-full border border-stone px-3 py-1 font-mono text-[11px] text-fog">
-                        {cat?.label[locale] ?? id} <b className="text-slate">{count}</b>
-                      </span>
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setActiveCategoryFilter((current) => (current === id ? null : id))}
+                        className={categoryChipClass(id, active)}
+                        aria-pressed={active}
+                      >
+                        {cat?.label[locale] ?? id} <b className={active ? "text-ivory" : "text-slate"}>{count}</b>
+                      </button>
                     );
                   })}
+                {activeCategoryFilter && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCategoryFilter(null)}
+                    className="rounded-full border border-stone bg-transparent px-3 py-1 font-mono text-[11px] text-fog transition-colors hover:border-slate/45 hover:text-slate"
+                  >
+                    {t.toolbar.clearCategoryFilter}
+                  </button>
+                )}
               </div>
             )}
 
@@ -521,18 +720,22 @@ export default function CypressClient() {
               {filteredRows.length === 0 ? (
                 <div className="px-5 py-10 text-center text-sm text-fog">{t.rows.emptyResult}</div>
               ) : (
-                filteredRows.map((r, i) => (
+                filteredRows.map(({ row: r, originalIndex }, i) => (
                   <RowCard
-                    key={`${r.serviceName}-${i}`}
+                    key={cleanupKeyForRow(activeCategoryId, r, originalIndex)}
                     row={r}
                     index={i}
                     locale={locale}
                     t={t}
-                    deleteEligible={activeCategoryId ? SCORED_CATEGORIES.includes(activeCategoryId) : false}
+                    deleteEligible={false}
                     supportEmail={SERVICE_EMAIL_MAP[r.serviceName]}
                     isRequested={requested.has(r.serviceName)}
                     onRequestSingle={requestSingle}
                     onMailtoClick={onMailtoClick}
+                    cleanupMode={cleanupMode}
+                    cleanupKey={cleanupKeyForRow(activeCategoryId, r, originalIndex)}
+                    cleanupSelected={cleanupSelected.has(cleanupKeyForRow(activeCategoryId, r, originalIndex))}
+                    onToggleCleanup={toggleCleanupService}
                   />
                 ))
               )}
@@ -547,20 +750,27 @@ export default function CypressClient() {
                   </div>
                 )}
                 <div className="mt-3 border border-stone">
-                  {dataset.kakao_collect_extra.rows.map((r, i) => (
-                    <RowCard
-                      key={`${r.serviceName}-${i}`}
-                      row={r}
-                      index={i}
-                      locale={locale}
-                      t={t}
-                      deleteEligible={SCORED_CATEGORIES.includes("kakao_collect_extra")}
-                      supportEmail={SERVICE_EMAIL_MAP[r.serviceName]}
-                      isRequested={requested.has(r.serviceName)}
-                      onRequestSingle={requestSingle}
-                      onMailtoClick={onMailtoClick}
-                    />
-                  ))}
+                  {dataset.kakao_collect_extra.rows
+                    .map((row, originalIndex) => ({ row, originalIndex }))
+                    .filter(({ row }) => !activeCategoryFilter || row.risk?.matched.some((m) => m.id === activeCategoryFilter))
+                    .map(({ row: r, originalIndex }, i) => (
+                      <RowCard
+                        key={cleanupKeyForRow("kakao_collect_extra", r, originalIndex)}
+                        row={r}
+                        index={i}
+                        locale={locale}
+                        t={t}
+                        deleteEligible={false}
+                        supportEmail={SERVICE_EMAIL_MAP[r.serviceName]}
+                        isRequested={requested.has(r.serviceName)}
+                        onRequestSingle={requestSingle}
+                        onMailtoClick={onMailtoClick}
+                        cleanupMode={cleanupMode}
+                        cleanupKey={cleanupKeyForRow("kakao_collect_extra", r, originalIndex)}
+                        cleanupSelected={cleanupSelected.has(cleanupKeyForRow("kakao_collect_extra", r, originalIndex))}
+                        onToggleCleanup={toggleCleanupService}
+                      />
+                    ))}
                 </div>
               </div>
             )}
@@ -568,8 +778,30 @@ export default function CypressClient() {
         )}
       </main>
 
-      <footer className="mt-16 border-t border-stone py-8 text-center">
-        <p className="text-xs text-fog">{t.footer.experimental}</p>
+      {hasAnyData && cleanupStep === "results" && (
+        <FloatingCleanupControls
+          t={t}
+          cleanupMode={cleanupMode}
+          selectedCount={cleanupSelectionCount}
+          onCleanupClick={() => {
+            if (cleanupMode) {
+              cleanupSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+              openCleanupReview();
+            }
+          }}
+        />
+      )}
+
+      <footer className="mt-16 border-t border-stone">
+        <div className="mx-auto grid max-w-5xl gap-8 px-6 py-12 md:grid-cols-2 md:px-10">
+          {t.footer.disclosures.map((section) => (
+            <section key={section.title}>
+              <h2 className="text-sm font-medium text-slate">{section.title}</h2>
+              <p className="mt-3 whitespace-pre-line text-xs leading-6 text-fog">{section.body}</p>
+            </section>
+          ))}
+        </div>
       </footer>
 
       {reportOpen && (
@@ -594,6 +826,167 @@ export default function CypressClient() {
   );
 }
 
+const CleanupReviewSection = forwardRef<HTMLElement, {
+  t: (typeof CYPRESS_CONTENT)["ko"];
+  mode: boolean;
+  step: CleanupStep;
+  selected: Set<string>;
+  customServiceEnabled: boolean;
+  customService: string;
+  onStart: () => void;
+  onToggleCustom: () => void;
+  onCustomServiceChange: (value: string) => void;
+  onSubmit: () => void;
+  onBack: () => void;
+}>(function CleanupReviewSection({
+  t,
+  mode,
+  step,
+  selected,
+  customServiceEnabled,
+  customService,
+  onStart,
+  onToggleCustom,
+  onCustomServiceChange,
+  onSubmit,
+  onBack,
+}, ref) {
+  const canSubmit = selected.size > 0 || (customServiceEnabled && customService.trim().length > 0);
+
+  if (step === "thanks") {
+    return (
+      <section ref={ref} className="mt-8 border border-stone bg-[#fbfaf7] px-6 py-8 md:px-8">
+        <p className="font-mono text-xs tracking-[0.16em] text-fog uppercase">{t.cleanupReview.thanksEyebrow}</p>
+        <h2 className="mt-4 font-display text-3xl leading-tight md:text-4xl">{t.cleanupReview.thanksTitle}</h2>
+        <p className="mt-5 max-w-2xl whitespace-pre-line text-sm leading-7 text-fog">{t.cleanupReview.thanksBody}</p>
+        <button
+          type="button"
+          onClick={onBack}
+          className="mt-8 inline-flex min-h-11 items-center border border-slate bg-slate px-5 py-2.5 text-xs tracking-[0.16em] text-ivory transition-opacity hover:opacity-90"
+        >
+          {t.cleanupReview.returnButton}
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      ref={ref}
+      className={`mt-8 border px-6 md:px-8 ${
+        mode
+          ? "border-stone bg-[#fbfaf7] py-8"
+          : "border-[#163140] bg-[#0b1e29] py-6 text-ivory shadow-[0_18px_50px_rgba(35,48,58,0.12)]"
+      }`}
+    >
+      <div className={`grid gap-6 ${mode ? "md:grid-cols-[0.85fr_1.15fr] md:gap-14" : "md:grid-cols-[1fr_auto] md:items-center"}`}>
+        <div>
+          <p className={`font-mono text-xs tracking-[0.16em] uppercase ${mode ? "text-fog" : "text-white/50"}`}>{t.cleanupReview.eyebrow}</p>
+          <h2 className={`mt-4 max-w-xl font-display leading-tight ${mode ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}>
+            {t.cleanupReview.title}
+          </h2>
+          <p className={`mt-4 max-w-lg whitespace-pre-line text-sm leading-7 ${mode ? "text-fog" : "text-white/62"}`}>{t.cleanupReview.body}</p>
+        </div>
+        {!mode && (
+          <div className="md:justify-self-end">
+            <button
+              type="button"
+              onClick={onStart}
+              className="inline-flex min-h-11 items-center border border-white/70 px-5 py-2.5 text-xs tracking-[0.16em] text-white transition-colors hover:bg-white hover:text-slate"
+            >
+              {t.cleanupReview.cta}
+            </button>
+          </div>
+        )}
+
+        {mode && (
+        <div className="border border-stone bg-ivory p-5 md:p-7">
+          <div className="flex items-baseline justify-between gap-4 border-b border-stone pb-4">
+            <p className="text-sm text-slate">{t.cleanupReview.selectionGuide}</p>
+            <span className="shrink-0 font-mono text-xs text-fog">{t.cleanupReview.selectedCount(selected.size)}</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            <label className="flex min-h-12 cursor-pointer items-center gap-3 border border-stone bg-ivory px-4 py-3 text-sm transition-colors hover:border-slate/40">
+              <input type="checkbox" checked={customServiceEnabled} onChange={onToggleCustom} className="h-5 w-5 accent-slate" />
+              <span>{t.cleanupReview.customOption}</span>
+            </label>
+            {customServiceEnabled && (
+              <input
+                type="text"
+                value={customService}
+                onChange={(e) => onCustomServiceChange(e.target.value)}
+                placeholder={t.cleanupReview.customPlaceholder}
+                className="min-h-12 w-full border border-stone bg-ivory px-4 text-sm focus:border-slate focus:outline-none"
+              />
+            )}
+          </div>
+
+          <p className="mt-5 whitespace-pre-line border-t border-stone pt-5 text-xs leading-6 text-fog">{t.cleanupReview.privacyNote}</p>
+          <button
+            type="button"
+            disabled={!canSubmit}
+            onClick={onSubmit}
+            className="mt-6 min-h-12 w-full bg-slate px-6 py-3 text-xs tracking-[0.16em] text-ivory transition-opacity hover:opacity-90 disabled:opacity-35"
+          >
+            {t.cleanupReview.submit}
+          </button>
+        </div>
+        )}
+      </div>
+    </section>
+  );
+});
+
+function FloatingCleanupControls({
+  t,
+  cleanupMode,
+  selectedCount,
+  onCleanupClick,
+}: {
+  t: (typeof CYPRESS_CONTENT)["ko"];
+  cleanupMode: boolean;
+  selectedCount: number;
+  onCleanupClick: () => void;
+}) {
+  const label = cleanupMode ? t.cleanupReview.selectedCount(selectedCount) : t.cleanupReview.cta;
+
+  return (
+    <div
+      className={`fixed right-5 top-[58vh] z-40 hidden -translate-y-1/2 items-center overflow-hidden border bg-[#fbfaf7]/88 text-slate shadow-[0_18px_46px_rgba(35,48,58,0.14)] backdrop-blur-md transition-all duration-300 md:inline-flex ${
+        cleanupMode ? "border-slate/55" : "border-stone/80"
+      }`}
+    >
+      <button
+        type="button"
+        aria-label="Top"
+        title="Top"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="flex h-12 w-11 items-center justify-center border-r border-stone/70 text-base text-fog transition-colors hover:bg-mist/70 hover:text-slate focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate focus-visible:outline-offset-[-2px]"
+      >
+        ↑
+      </button>
+      <button
+        type="button"
+        onClick={onCleanupClick}
+        className={`flex h-12 min-w-[148px] items-center justify-center px-5 text-[11px] tracking-[0.15em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate focus-visible:outline-offset-[-2px] ${
+          cleanupMode ? "bg-slate text-ivory hover:bg-slate-700" : "text-slate hover:bg-mist/70"
+        }`}
+      >
+        {label}
+      </button>
+      <button
+        type="button"
+        aria-label="Bottom"
+        title="Bottom"
+        onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })}
+        className="flex h-12 w-11 items-center justify-center border-l border-stone/70 text-base text-fog transition-colors hover:bg-mist/70 hover:text-slate focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate focus-visible:outline-offset-[-2px]"
+      >
+        ↓
+      </button>
+    </div>
+  );
+}
+
 function RowCard({
   row,
   index,
@@ -604,6 +997,10 @@ function RowCard({
   isRequested,
   onRequestSingle,
   onMailtoClick,
+  cleanupMode,
+  cleanupKey,
+  cleanupSelected,
+  onToggleCleanup,
 }: {
   row: NormalizedRow;
   index: number;
@@ -614,25 +1011,31 @@ function RowCard({
   isRequested: boolean;
   onRequestSingle: (serviceName: string) => void;
   onMailtoClick: (serviceName: string) => void;
+  cleanupMode: boolean;
+  cleanupKey: string;
+  cleanupSelected: boolean;
+  onToggleCleanup: (cleanupKey: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
   const risk = row.risk;
   const grade = risk && risk.score > 0 ? gradeOf(risk.score) : null;
-  const gradeToneClass: Record<string, string> = {
-    g5: "border-warm-beige bg-warm-beige/15 text-slate font-semibold",
-    g4: "border-warm-beige bg-warm-beige/10 text-slate font-medium",
-    g3: "border-stone text-slate",
-    g2: "border-stone text-slate-500",
-    g1: "border-stone text-fog",
-  };
 
   return (
-    <div className="border-b border-stone px-5 py-4 last:border-b-0">
+    <div className={`border-b border-stone px-5 py-4 transition-colors last:border-b-0 ${cleanupSelected ? "bg-mist/60" : ""}`}>
       <div className="flex flex-wrap items-center gap-2">
+        {cleanupMode && (
+          <input
+            type="checkbox"
+            aria-label={t.cleanupReview.rowCheckboxLabel(row.serviceName)}
+            checked={cleanupSelected}
+            onChange={() => onToggleCleanup(cleanupKey)}
+            className="mr-1 h-5 w-5 accent-slate"
+          />
+        )}
         <span className="font-mono text-[11px] text-fog">{String(index + 1).padStart(3, "0")}</span>
         <span className="text-sm font-medium">{row.serviceName}</span>
         {grade && (
-          <span className={`rounded border px-2 py-0.5 font-mono text-[11px] ${gradeToneClass[grade.cls]}`}>
+          <span className={`rounded border px-2 py-0.5 font-mono text-[11px] ${gradeToneClass(grade.cls)}`}>
             {risk!.score} · {grade.label[locale]}
           </span>
         )}
@@ -647,7 +1050,9 @@ function RowCard({
         {row.fieldOrder.map((key) => (
           <div key={key} className="contents">
             <dt className="font-mono text-fog">{key}</dt>
-            <dd className="break-words">{row.fields[key] || "—"}</dd>
+            <dd className="break-words">
+              <LinkifiedText text={row.fields[key] || "—"} />
+            </dd>
           </div>
         ))}
         {row.link && (
