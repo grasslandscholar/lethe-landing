@@ -29,6 +29,7 @@ const SCORED_CATEGORIES: CategoryId[] = ["kakao", "kakao_collect", "kakao_collec
 const COMPARABLE_CATEGORIES: CategoryId[] = ["kakao", "naver"];
 const HIGH_RISK_THRESHOLD = 60;
 const CLEANUP_KEY_SEPARATOR = "\u001f";
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 function providerFromCategories(categories: ParsedCategory[]): PlatformTab | "mixed" | "unknown" {
   const providers = new Set<PlatformTab>();
@@ -366,7 +367,17 @@ export default function CypressClient() {
 
   const handleFiles = useCallback((fileList: FileList | null) => {
     if (!fileList || !fileList.length) return;
-    const files = [...fileList].slice(0, 1);
+    const [file] = [...fileList];
+    if (!file) return;
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setErrors(["fileTooLarge"]);
+      setStage("done");
+      trackPocEvent("analysis_failed", { provider: providerFromText(file.name), error_type: "fileTooLarge" });
+      return;
+    }
+
+    const files = [file];
     setStage("reading");
 
     const readers = files.map(

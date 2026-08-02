@@ -31,6 +31,7 @@ export interface CypressContent {
   errors: {
     harUnrecognized: string;
     fileTypeUnrecognized: string;
+    fileTooLarge: string;
     kakaoThirdPartyRequired: string;
     naverHarRequired: string;
   };
@@ -189,6 +190,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "HAR 파일 안에서 연결된 서비스 데이터를 찾지 못했습니다. 연결된 서비스 페이지를 새로고침한 뒤 다시 내보내주세요.",
       fileTypeUnrecognized: "이 파일 형식을 인식하지 못했습니다. 지원 형식(.html/.htm/.json/.har)을 확인해주세요.",
+      fileTooLarge: "파일이 너무 큽니다. 10MB 이하의 HTML 또는 HAR 파일을 올려주세요.",
       kakaoThirdPartyRequired: "카카오는 개인정보 이용 현황의 \"제3자 제공\" 탭을 HTML로 저장한 파일만 올려주세요.",
       naverHarRequired: "네이버는 연결된 서비스 관리 페이지에서 저장한 HAR 파일만 올려주세요.",
     },
@@ -376,6 +378,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "Couldn't find connected-service data in this HAR file. Refresh the connected-services page and export again.",
       fileTypeUnrecognized: "This file type wasn't recognized. Please check the supported formats (.html/.htm/.json/.har).",
+      fileTooLarge: "This file is too large. Please upload an HTML or HAR file under 10MB.",
       kakaoThirdPartyRequired: "For Kakao, upload only the HTML file saved from the \"Third-party sharing\" tab.",
       naverHarRequired: "For Naver, upload only the HAR file saved from the connected-services management page.",
     },
@@ -563,6 +566,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "HARファイル内で連携サービスのデータが見つかりませんでした。連携サービスページを再読み込みしてから再度書き出してください。",
       fileTypeUnrecognized: "このファイル形式は認識できませんでした。対応形式(.html/.htm/.json/.har)をご確認ください。",
+      fileTooLarge: "ファイルが大きすぎます。10MB以下のHTMLまたはHARファイルをアップロードしてください。",
       kakaoThirdPartyRequired: "Kakaoは、個人情報現況の「第三者提供」タブをHTMLで保存したファイルのみアップロードしてください。",
       naverHarRequired: "Naverは、連携サービス管理ページから保存したHARファイルのみアップロードしてください。",
     },

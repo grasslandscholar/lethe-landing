@@ -3,6 +3,16 @@ import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
+function sanitizeServiceName(value: string) {
+  return value
+    .normalize("NFKC")
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100);
+}
+
 function sanitizeServices(value: unknown) {
   if (!Array.isArray(value)) return [];
 
@@ -10,9 +20,8 @@ function sanitizeServices(value: unknown) {
     ...new Set(
       value
         .filter((item): item is string => typeof item === "string")
-        .map((item) => item.trim())
+        .map(sanitizeServiceName)
         .filter(Boolean)
-        .map((item) => item.slice(0, 100))
     ),
   ].slice(0, 50);
 }
@@ -26,7 +35,7 @@ function sanitizeServiceItems(value: unknown, services: string[]) {
   const items = value
     .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null && !Array.isArray(item))
     .map((item) => {
-      const service = typeof item.service === "string" ? item.service.trim().slice(0, 100) : "";
+      const service = typeof item.service === "string" ? sanitizeServiceName(item.service) : "";
       const provider = typeof item.provider === "string" && allowedProviders.has(item.provider) ? item.provider : "unknown";
       return service ? { service, provider } : null;
     })
