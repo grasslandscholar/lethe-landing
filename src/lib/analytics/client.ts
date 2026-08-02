@@ -5,6 +5,11 @@ export type { LetheEventName, LetheEventProperties } from "./types";
 
 const SESSION_STORAGE_KEY = "lethe_session_id";
 
+export type CleanupServiceItem = {
+  service: string;
+  provider: "kakao" | "naver" | "generic" | "custom" | "mixed" | "unknown";
+};
+
 function createSessionId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `lethe-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -37,9 +42,9 @@ export function recordLetheEvent(event: LetheEventName, properties: LetheEventPr
   }).catch(() => undefined);
 }
 
-export function recordCleanupRequest(services: string[]) {
+export function recordCleanupRequest(services: string[], serviceItems: CleanupServiceItem[] = []) {
   const sessionId = getLetheSessionId();
-  if (!sessionId) return Promise.resolve();
+  if (!sessionId) return Promise.resolve(null);
 
   return fetch("/api/cleanup-requests", {
     method: "POST",
@@ -47,7 +52,12 @@ export function recordCleanupRequest(services: string[]) {
     body: JSON.stringify({
       session_id: sessionId,
       services,
+      service_items: serviceItems,
     }),
-    keepalive: true,
-  }).catch(() => undefined);
+  })
+    .then((response) => {
+      if (!response.ok) return null;
+      return response.json() as Promise<{ ok: boolean; id?: string }>;
+    })
+    .catch(() => null);
 }

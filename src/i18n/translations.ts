@@ -5,6 +5,7 @@ export const translations = {
     nav: {
       cta: "가입한 서비스 살펴보기",
       privacy: "쓰는 정보",
+      reading: "읽을거리",
     },
     hero: {
       title: "LETHE",
@@ -210,7 +211,7 @@ export const translations = {
         sections: [
           {
             title: "우리는 어떤 정보를 받을까요?",
-            body: "인터뷰를 신청하실 경우 아래 정보를 받을 수 있습니다.\n\n• 이름 또는 닉네임\n• 이메일 주소\n• 신청 과정에서 직접 작성한 내용\n\n또한 서비스를 더 편리하게 만들기 위해 페이지 방문이나 버튼 클릭과 같은 비식별 이용 통계를 확인할 수 있습니다.\n\n다만 업로드한 파일의 내용이나 분석 결과는 Lethe 서버에 저장되지 않습니다.",
+            body: "인터뷰를 신청하실 경우 아래 정보를 받을 수 있습니다.\n\n• 이름 또는 닉네임\n• 이메일 주소\n• 신청 과정에서 직접 작성한 내용\n\n또한 서비스를 더 편리하게 만들기 위해 페이지 방문이나 버튼 클릭과 같은 비식별 이용 통계를 확인할 수 있습니다.\n\n삭제 검토를 요청할 경우, 직접 선택하거나 입력한 서비스명은 삭제 가이드 준비와 지원 우선순위 검토를 위해 사용될 수 있습니다.\n\n다만 업로드한 파일, 파일명, 분석 결과, 자동으로 추출된 전체 서비스 목록은 Lethe 서버에 저장되지 않습니다.",
           },
           {
             title: "왜 필요한가요?",
@@ -218,7 +219,7 @@ export const translations = {
           },
           {
             title: "업로드한 파일은 어떻게 처리되나요?",
-            body: "Lethe는 업로드한 파일을 브라우저 안에서만 분석합니다.\n\n• 파일은 Lethe 서버로 전송되지 않습니다.\n• 분석 결과도 서버에 저장되지 않습니다.\n• 페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다.",
+            body: "Lethe는 업로드한 파일을 브라우저 안에서만 분석합니다.\n\n• 파일은 Lethe 서버로 전송되지 않습니다.\n• 분석 결과도 서버에 저장되지 않습니다.\n• 자동으로 추출된 전체 서비스 목록은 서버에 저장되지 않습니다.\n• 페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다.",
           },
           {
             title: "정보는 얼마나 보관하나요?",
@@ -250,17 +251,17 @@ export const translations = {
           },
           {
             title: "1. 수집하는 개인정보",
-            body: "서비스는 다음의 개인정보를 수집할 수 있습니다.\n\n인터뷰 신청 시\n• 이름 또는 닉네임\n• 이메일 주소\n• 이용자가 직접 작성한 신청 내용\n\n서비스 이용 시\n서비스 개선과 사용성 분석을 위해 페이지 이용에 관한 비식별 이용 통계를 수집할 수 있습니다. 여기에는 페이지 방문, 버튼 클릭, 분석 시작 및 완료 여부 등 서비스 이용 과정에서 발생하는 정보가 포함될 수 있습니다.\n\n업로드한 파일의 내용, 분석 결과, 가입한 서비스 정보 등 개인정보는 Lethe 서버에 저장되지 않습니다.",
+            body: "서비스는 다음의 정보를 수집하거나 확인할 수 있습니다.\n\n인터뷰 신청 시\n• 이름 또는 닉네임\n• 이메일 주소\n• 이용자가 직접 작성한 신청 내용\n\n서비스 이용 시\n서비스 개선과 사용성 분석을 위해 페이지 이용에 관한 비식별 이용 통계를 확인할 수 있습니다. 여기에는 페이지 방문, 버튼 클릭, 분석 시작 및 완료 여부 등 서비스 이용 과정에서 발생하는 정보가 포함될 수 있습니다.\n\n삭제 검토 요청 시\n• 이용자가 직접 선택하거나 입력한 서비스명\n\n업로드한 파일, 파일명, 분석 결과, 자동으로 추출된 전체 서비스 목록은 Lethe 서버에 저장되지 않습니다.",
           },
           {
             title: "2. 개인정보 이용 목적",
             body: "수집한 정보는 다음의 목적에 한하여 이용됩니다.",
-            items: ["인터뷰 일정 조율", "서비스 연구 및 개발", "사용자 경험 개선", "서비스 이용 현황 분석"],
+            items: ["인터뷰 일정 조율", "서비스 연구 및 개발", "사용자 경험 개선", "서비스 이용 현황 분석", "삭제 가이드 준비 및 지원 우선순위 검토"],
           },
           {
             title: "3. 브라우저 내 분석",
             body: "Lethe의 분석 기능은 이용자가 업로드한 파일을 브라우저 안에서만 분석합니다.",
-            items: ["업로드한 파일은 Lethe 서버로 전송되지 않습니다.", "분석 결과는 Lethe 서버에 저장되지 않습니다.", "페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다."],
+            items: ["업로드한 파일은 Lethe 서버로 전송되지 않습니다.", "분석 결과는 Lethe 서버에 저장되지 않습니다.", "자동으로 추출된 전체 서비스 목록은 Lethe 서버에 저장되지 않습니다.", "페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다."],
           },
           {
             title: "4. 개인정보 보관 기간",
@@ -291,6 +292,7 @@ export const translations = {
     nav: {
       cta: "Review Joined Services",
       privacy: "Data We Use",
+      reading: "Reading",
     },
     hero: {
       title: "LETHE",
@@ -496,7 +498,7 @@ export const translations = {
         sections: [
           {
             title: "What information do we receive?",
-            body: "If you apply for an interview, we may receive the following information.\n\n• Name or nickname\n• Email address\n• Information you write during the application process\n\nWe may also review non-identifying usage analytics, such as page visits or button clicks, to make the service easier to use.\n\nHowever, the contents of uploaded files and analysis results are not stored on Lethe servers.",
+            body: "If you apply for an interview, we may receive the following information.\n\n• Name or nickname\n• Email address\n• Information you write during the application process\n\nWe may also review non-identifying usage analytics, such as page visits or button clicks, to make the service easier to use.\n\nIf you request a cleanup review, the service names you directly select or enter may be used to prepare deletion guides and review support priorities.\n\nHowever, uploaded files, file names, analysis results, and the full automatically extracted service list are not stored on Lethe servers.",
           },
           {
             title: "Why do we need it?",
@@ -504,7 +506,7 @@ export const translations = {
           },
           {
             title: "How are uploaded files handled?",
-            body: "Lethe analyzes uploaded files only inside your browser.\n\n• Files are not sent to Lethe servers.\n• Analysis results are not stored on the server.\n• When you refresh or close the page, all analysis data disappears.",
+            body: "Lethe analyzes uploaded files only inside your browser.\n\n• Files are not sent to Lethe servers.\n• Analysis results are not stored on the server.\n• The full automatically extracted service list is not stored on the server.\n• When you refresh or close the page, all analysis data disappears.",
           },
           {
             title: "How long is information kept?",
@@ -528,34 +530,43 @@ export const translations = {
       },
       detail: {
         heading: "Privacy Policy",
-        updated: "Last updated: 2026.06.23",
+        updated: "Effective date: 2026.08.01",
         sections: [
           {
-            title: "Information we collect",
-            items: ["Name or nickname", "Email address", "Information users write during the interview application process"],
+            title: "Overview",
+            body: "Lethe (the “Service”) values users’ personal information and works to comply with applicable privacy laws.",
           },
           {
-            title: "Why we use it",
-            items: ["Interview scheduling", "Collecting user experience and opinions", "Service research and development"],
+            title: "1. Information we may collect or review",
+            body: "The Service may collect or review the following information.\n\nWhen applying for an interview\n• Name or nickname\n• Email address\n• Information users write during the application process\n\nWhen using the Service\nTo improve the service and understand usability, we may review non-identifying usage analytics related to page use. This may include page visits, button clicks, and whether analysis starts or completes.\n\nWhen requesting a cleanup review\n• Service names the user directly selects or enters\n\nUploaded files, file names, analysis results, and the full automatically extracted service list are not stored on Lethe servers.",
           },
           {
-            title: "Retention period",
-            body: "Collected information is retained for research and interview purposes and deleted without delay in the following cases.",
-            items: ["When the research purpose has been achieved", "When the user requests deletion"],
+            title: "2. Why we use information",
+            body: "Collected information is used only for the following purposes.",
+            items: ["Interview scheduling", "Service research and development", "User experience improvement", "Understanding service usage", "Preparing deletion guides and reviewing support priorities"],
           },
           {
-            title: "Third-party sharing",
-            body: "Lethe currently uses information within the scope needed for interviews, research, and development. When external services are used, necessary information may be transferred to those services.",
+            title: "3. Browser-based analysis",
+            body: "Lethe’s analysis feature analyzes uploaded files only inside the user’s browser.",
+            items: ["Uploaded files are not sent to Lethe servers.", "Analysis results are not stored on Lethe servers.", "The full automatically extracted service list is not stored on Lethe servers.", "When the page is refreshed or closed, analysis data disappears."],
           },
           {
-            title: "External services",
-            body: "We may use external services such as the following for interview applications and scheduling. Necessary information may be transferred to those services during use.",
-            items: ["Google Forms", "Google Calendar", "Calendly"],
+            title: "4. Retention period",
+            body: "Personal information collected for interview applications is kept only for the period necessary for research and interviews, and is deleted without delay in the following cases.",
+            items: ["When the research purpose has been achieved", "When the user requests deletion", "When any legally required retention period has ended"],
           },
           {
-            title: "Your rights",
+            title: "5. External services",
+            body: "We may use the following external services to operate the Service.\n\n• Google Forms\n• Google Calendar\n• Calendly\n\nNecessary information may be processed according to each service’s own policy.",
+          },
+          {
+            title: "6. User rights",
             body: "You may request the following regarding your information at any time.",
             items: ["Access", "Correction", "Deletion"],
+          },
+          {
+            title: "7. Changes to this Privacy Policy",
+            body: "This Privacy Policy may be updated as the Service changes or applicable laws are revised. Changes will be announced on this page.",
           },
         ],
         contactTitle: "Contact",
@@ -568,6 +579,7 @@ export const translations = {
     nav: {
       cta: "登録したサービスを見る",
       privacy: "使う情報",
+      reading: "読みもの",
     },
     hero: {
       title: "LETHE",
@@ -773,7 +785,7 @@ export const translations = {
         sections: [
           {
             title: "どのような情報を受け取りますか？",
-            body: "インタビューに申し込む場合、以下の情報を受け取ることがあります。\n\n• 名前またはニックネーム\n• メールアドレス\n• 申込過程で直接記入した内容\n\nまた、サービスをより使いやすくするため、ページ訪問やボタンのクリックなど、個人を特定しない利用統計を確認することがあります。\n\nただし、アップロードしたファイルの内容や分析結果はLetheのサーバーに保存されません。",
+            body: "インタビューに申し込む場合、以下の情報を受け取ることがあります。\n\n• 名前またはニックネーム\n• メールアドレス\n• 申込過程で直接記入した内容\n\nまた、サービスをより使いやすくするため、ページ訪問やボタンのクリックなど、個人を特定しない利用統計を確認することがあります。\n\n削除検討を依頼する場合、直接選択または入力したサービス名は、削除ガイドの準備と支援優先順位の検討に使用されることがあります。\n\nただし、アップロードしたファイル、ファイル名、分析結果、自動抽出されたサービス一覧全体はLetheのサーバーに保存されません。",
           },
           {
             title: "なぜ必要ですか？",
@@ -781,7 +793,7 @@ export const translations = {
           },
           {
             title: "アップロードしたファイルはどう処理されますか？",
-            body: "Letheはアップロードしたファイルをブラウザ内だけで分析します。\n\n• ファイルはLetheのサーバーに送信されません。\n• 分析結果もサーバーに保存されません。\n• ページを更新または終了すると、分析データはすべて消えます。",
+            body: "Letheはアップロードしたファイルをブラウザ内だけで分析します。\n\n• ファイルはLetheのサーバーに送信されません。\n• 分析結果もサーバーに保存されません。\n• 自動抽出されたサービス一覧全体はサーバーに保存されません。\n• ページを更新または終了すると、分析データはすべて消えます。",
           },
           {
             title: "情報はどのくらい保管されますか？",
@@ -805,34 +817,43 @@ export const translations = {
       },
       detail: {
         heading: "プライバシーポリシー",
-        updated: "最終更新日: 2026.06.23",
+        updated: "施行日: 2026.08.01",
         sections: [
           {
-            title: "収集する情報",
-            items: ["名前またはニックネーム", "メールアドレス", "インタビュー申込過程でユーザーが直接記入した内容"],
+            title: "概要",
+            body: "Lethe（以下「サービス」）は、利用者の個人情報を大切に考え、個人情報保護に関する法令を遵守するよう努めます。",
           },
           {
-            title: "情報を使用する理由",
-            items: ["インタビューの日程調整", "ユーザー体験と意見の収集", "サービス研究と開発"],
+            title: "1. 収集または確認する情報",
+            body: "サービスは、以下の情報を収集または確認することがあります。\n\nインタビュー申込時\n• 名前またはニックネーム\n• メールアドレス\n• 利用者が申込過程で直接記入した内容\n\nサービス利用時\nサービス改善と使いやすさの分析のため、ページ利用に関する個人を特定しない利用統計を確認することがあります。これには、ページ訪問、ボタンのクリック、分析の開始・完了有無など、サービス利用過程で発生する情報が含まれる場合があります。\n\n削除検討を依頼する場合\n• 利用者が直接選択または入力したサービス名\n\nアップロードしたファイル、ファイル名、分析結果、自動抽出されたサービス一覧全体はLetheのサーバーに保存されません。",
           },
           {
-            title: "保管期間",
-            body: "収集された情報は研究およびインタビュー進行のために保管され、以下の場合には遅滞なく削除されます。",
-            items: ["研究目的が達成された場合", "利用者が削除を依頼した場合"],
+            title: "2. 個人情報の利用目的",
+            body: "収集した情報は、以下の目的に限って利用されます。",
+            items: ["インタビューの日程調整", "サービス研究および開発", "ユーザー体験の改善", "サービス利用状況の分析", "削除ガイドの準備および支援優先順位の検討"],
           },
           {
-            title: "第三者提供",
-            body: "現在Letheは、インタビュー進行と研究・開発に必要な範囲で情報を使用します。外部サービスを利用する過程で、必要な情報が当該サービスに送信される場合があります。",
+            title: "3. ブラウザ内分析",
+            body: "Letheの分析機能は、利用者がアップロードしたファイルをブラウザ内だけで分析します。",
+            items: ["アップロードしたファイルはLetheのサーバーに送信されません。", "分析結果はLetheのサーバーに保存されません。", "自動抽出されたサービス一覧全体はLetheのサーバーに保存されません。", "ページを更新または終了すると、分析データはすべて消えます。"],
           },
           {
-            title: "外部サービスの利用",
-            body: "インタビュー申込および日程調整の過程で、以下のような外部サービスを利用することがあります。利用過程で必要な情報が当該サービスに送信される場合があります。",
-            items: ["Google Forms", "Google Calendar", "Calendly"],
+            title: "4. 個人情報の保管期間",
+            body: "インタビュー申込のために収集された個人情報は、研究およびインタビュー進行に必要な期間だけ保管し、以下の場合には遅滞なく削除します。",
+            items: ["研究目的が達成された場合", "利用者が削除を依頼した場合", "関連法令に基づく保管義務が終了した場合"],
           },
           {
-            title: "利用者の権利",
+            title: "5. 外部サービスの利用",
+            body: "サービス運営のため、以下の外部サービスを利用することがあります。\n\n• Google Forms\n• Google Calendar\n• Calendly\n\n必要な情報は、各サービスのポリシーに従って処理される場合があります。",
+          },
+          {
+            title: "6. 利用者の権利",
             body: "利用者はいつでも自分の情報について以下を請求できます。",
             items: ["閲覧", "修正", "削除"],
+          },
+          {
+            title: "7. プライバシーポリシーの変更",
+            body: "本プライバシーポリシーは、サービスの変更または関連法令の改正により修正される場合があります。変更事項は本ページでお知らせします。",
           },
         ],
         contactTitle: "お問い合わせ",

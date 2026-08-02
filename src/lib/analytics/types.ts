@@ -5,6 +5,7 @@ export type LetheEventName =
   | "analysis_completed"
   | "analysis_failed"
   | "cleanup_interest_clicked"
-  | "cleanup_priority_submitted";
+  | "cleanup_priority_submitted"
+  | "cleanup_guide_requested";
 
 export type LetheEventProperties = Record<string, string | number | boolean | null>;

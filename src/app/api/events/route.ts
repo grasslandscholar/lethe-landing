@@ -12,6 +12,7 @@ const ALLOWED_EVENTS = new Set<LetheEventName>([
   "analysis_failed",
   "cleanup_interest_clicked",
   "cleanup_priority_submitted",
+  "cleanup_guide_requested",
 ]);
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

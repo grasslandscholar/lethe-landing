@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { track } from "@vercel/analytics";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -13,11 +14,16 @@ import { gradeOf, scoreFromCategories, staleMultiplier } from "@/lib/cypress/sco
 import { parseFile, type CategoryId, type ParsedCategory } from "@/lib/cypress/parsers";
 import { SERVICE_EMAIL_MAP } from "@/lib/cypress/serviceEmailMap";
 import type { NormalizedRow, TabDataset } from "@/lib/cypress/types";
-import { recordCleanupRequest, recordLetheEvent, type LetheEventName, type LetheEventProperties } from "@/lib/analytics/client";
+import { recordCleanupRequest, recordLetheEvent, type CleanupServiceItem, type LetheEventName, type LetheEventProperties } from "@/lib/analytics/client";
 
 type Dataset = Partial<Record<CategoryId, TabDataset>>;
 type PlatformTab = "kakao" | "naver" | "generic";
 type CleanupStep = "results" | "thanks";
+type UploadedFileStatus = {
+  name: string;
+  provider: PlatformTab | "mixed" | "unknown";
+  status: "ready" | "error";
+};
 
 const SCORED_CATEGORIES: CategoryId[] = ["kakao", "kakao_collect", "kakao_collect_extra", "naver", "generic"];
 const COMPARABLE_CATEGORIES: CategoryId[] = ["kakao", "naver"];
@@ -34,6 +40,18 @@ function providerFromCategories(categories: ParsedCategory[]): PlatformTab | "mi
   if (providers.size === 0) return "unknown";
   if (providers.size > 1) return "mixed";
   return [...providers][0];
+}
+
+function providerFromCategoryId(categoryId: CategoryId): PlatformTab {
+  if (categoryId.startsWith("kakao")) return "kakao";
+  if (categoryId === "naver") return "naver";
+  return "generic";
+}
+
+function categoryIdsForProvider(provider: PlatformTab): CategoryId[] {
+  if (provider === "kakao") return ["kakao", "kakao_collect", "kakao_collect_extra", "kakao_provider"];
+  if (provider === "naver") return ["naver"];
+  return ["generic"];
 }
 
 function providerFromDataset(dataset: Dataset): PlatformTab | "mixed" | "unknown" {
@@ -70,6 +88,86 @@ function cleanupKeyForRow(categoryId: CategoryId, row: NormalizedRow, rowIndex: 
 
 function serviceNameFromCleanupKey(key: string) {
   return key.split(CLEANUP_KEY_SEPARATOR)[2] ?? key;
+}
+
+function providerFromCleanupKey(key: string): CleanupServiceItem["provider"] {
+  const categoryId = key.split(CLEANUP_KEY_SEPARATOR)[0] ?? "";
+  if (categoryId.startsWith("kakao")) return "kakao";
+  if (categoryId === "naver") return "naver";
+  if (categoryId === "generic") return "generic";
+  return "unknown";
+}
+
+function isCleanupEligibleCategory(categoryId: CategoryId) {
+  return categoryId === "naver" || categoryId === "kakao" || categoryId === "generic";
+}
+
+function cleanupServiceItemsFromSelection(selected: Set<string>, customServiceName: string): CleanupServiceItem[] {
+  const items = [...selected]
+    .filter((key) => isCleanupEligibleCategory(key.split(CLEANUP_KEY_SEPARATOR)[0] as CategoryId))
+    .map((key) => ({
+      service: serviceNameFromCleanupKey(key),
+      provider: providerFromCleanupKey(key),
+    }));
+
+  if (customServiceName) {
+    items.push({
+      service: customServiceName,
+      provider: "custom",
+    });
+  }
+
+  const merged = new Map<string, CleanupServiceItem>();
+  items.forEach((item) => {
+    const key = item.service.toLocaleLowerCase();
+    const existing = merged.get(key);
+    if (!existing) {
+      merged.set(key, item);
+      return;
+    }
+
+    if (existing.provider !== item.provider) {
+      merged.set(key, { ...existing, provider: "mixed" });
+    }
+  });
+
+  return [...merged.values()];
+}
+
+function isHarText(text: string, filename: string) {
+  if (/\.har$/i.test(filename)) return true;
+
+  try {
+    const json = JSON.parse(text.trim()) as { log?: { entries?: unknown[] } };
+    return Array.isArray(json.log?.entries);
+  } catch {
+    return false;
+  }
+}
+
+function acceptedCategoriesForPoc(
+  result: { text: string; name: string },
+  categories: ParsedCategory[]
+): { categories: ParsedCategory[]; provider: PlatformTab | "unknown"; error?: keyof CypressContent["errors"] } {
+  const naverCategories = categories.filter((cat) => cat.id === "naver");
+  if (naverCategories.length > 0) {
+    if (!isHarText(result.text, result.name)) return { categories: [], provider: "naver", error: "naverHarRequired" };
+
+    const usableNaverCategories = naverCategories.filter((cat) => cat.rows.length > 0);
+    if (!usableNaverCategories.length) return { categories: [], provider: "naver", error: "harUnrecognized" };
+    return { categories: usableNaverCategories, provider: "naver" };
+  }
+
+  const kakaoThirdPartyCategories = categories.filter((cat) => cat.id === "kakao" && cat.rows.length > 0);
+  if (kakaoThirdPartyCategories.length > 0) {
+    return { categories: kakaoThirdPartyCategories, provider: "kakao" };
+  }
+
+  if (categories.some((cat) => cat.id.startsWith("kakao"))) {
+    return { categories: [], provider: "kakao", error: "kakaoThirdPartyRequired" };
+  }
+
+  return { categories: [], provider: "unknown", error: "fileTypeUnrecognized" };
 }
 
 function gradeToneClass(cls: string) {
@@ -169,20 +267,22 @@ function trackPocEvent(event: LetheEventName, properties: LetheEventProperties =
 
 export default function CypressClient() {
   const { locale, setLocale } = useLanguage();
+  const router = useRouter();
   const t = CYPRESS_CONTENT[locale];
 
   const [dataset, setDataset] = useState<Dataset>({});
   const [platformTabOverride, setPlatformTabOverride] = useState<PlatformTab | null>(null);
-  const [kakaoSubTabOverride, setKakaoSubTabOverride] = useState<CategoryId | null>(null);
   const [search, setSearch] = useState("");
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string | null>(null);
   const [sortByRisk, setSortByRisk] = useState(false);
   const [stage, setStage] = useState<"idle" | "reading" | "parsing" | "done">("idle");
   const [errors, setErrors] = useState<(keyof CypressContent["errors"])[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileStatus[]>([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [cleanupStep, setCleanupStep] = useState<CleanupStep>("results");
   const [cleanupMode, setCleanupMode] = useState(false);
+  const [cleanupSubmitting, setCleanupSubmitting] = useState(false);
   const [cleanupSelected, setCleanupSelected] = useState<Set<string>>(new Set());
   const [customServiceEnabled, setCustomServiceEnabled] = useState(false);
   const [customService, setCustomService] = useState("");
@@ -211,6 +311,45 @@ export default function CypressClient() {
     [locale]
   );
 
+  const resetUploadedFiles = useCallback(() => {
+    setDataset({});
+    setUploadedFiles([]);
+    setErrors([]);
+    setStage("idle");
+    setPlatformTabOverride(null);
+    setSearch("");
+    setActiveCategoryFilter(null);
+    setSortByRisk(false);
+    setCleanupStep("results");
+    setCleanupMode(false);
+    setCleanupSelected(new Set());
+    setCustomServiceEnabled(false);
+    setCustomService("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, []);
+
+  const clearUploadedProvider = useCallback((provider: PlatformTab) => {
+    setDataset((prev) => {
+      const next: Dataset = { ...prev };
+      categoryIdsForProvider(provider).forEach((id) => {
+        delete next[id];
+      });
+      return next;
+    });
+    setUploadedFiles((prev) => prev.filter((file) => file.provider !== provider));
+    setCleanupSelected((prev) => {
+      const next = new Set(prev);
+      [...next].forEach((key) => {
+        const categoryId = key.split(CLEANUP_KEY_SEPARATOR)[0] as CategoryId;
+        if (providerFromCategoryId(categoryId) === provider) next.delete(key);
+      });
+      return next;
+    });
+    setErrors([]);
+    setStage("idle");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, []);
+
   const hasKakao = Boolean(dataset.kakao || dataset.kakao_collect || dataset.kakao_provider);
   const hasNaver = Boolean(dataset.naver);
   const hasGeneric = Boolean(dataset.generic);
@@ -221,15 +360,13 @@ export default function CypressClient() {
   const setPlatformTab = setPlatformTabOverride;
 
   const defaultKakaoSubTab: CategoryId = dataset.kakao ? "kakao" : dataset.kakao_collect ? "kakao_collect" : "kakao_provider";
-  const kakaoSubTab = kakaoSubTabOverride ?? defaultKakaoSubTab;
-  const setKakaoSubTab = setKakaoSubTabOverride;
 
-  const activeCategoryId: CategoryId | null = platformTab === "kakao" ? kakaoSubTab : platformTab;
+  const activeCategoryId: CategoryId | null = platformTab === "kakao" ? defaultKakaoSubTab : platformTab;
   const activeTab = activeCategoryId ? dataset[activeCategoryId] : undefined;
 
   const handleFiles = useCallback((fileList: FileList | null) => {
     if (!fileList || !fileList.length) return;
-    const files = [...fileList];
+    const files = [...fileList].slice(0, 1);
     setStage("reading");
 
     const readers = files.map(
@@ -250,6 +387,7 @@ export default function CypressClient() {
 
       const newErrors: (keyof CypressContent["errors"])[] = [];
       const parsedByFile: ParsedCategory[][] = [];
+      const nextUploadedFiles: UploadedFileStatus[] = [];
       for (const result of results) {
         if (!result) {
           newErrors.push("fileTypeUnrecognized");
@@ -266,45 +404,73 @@ export default function CypressClient() {
           newErrors.push("fileTypeUnrecognized");
           continue;
         }
-        parsedByFile.push(categories);
+        const accepted = acceptedCategoriesForPoc(result, categories);
+        if (accepted.error) {
+          newErrors.push(accepted.error);
+          continue;
+        }
+
+        parsedByFile.push(accepted.categories);
+        nextUploadedFiles.push({
+          name: result.name,
+          provider: accepted.provider,
+          status: "ready",
+        });
       }
+
+      setUploadedFiles((prev) => {
+        const replacementProviders = new Set(
+          nextUploadedFiles.map((file) => file.provider).filter((item): item is PlatformTab => item === "kakao" || item === "naver" || item === "generic")
+        );
+        return [...prev.filter((file) => !replacementProviders.has(file.provider as PlatformTab)), ...nextUploadedFiles];
+      });
 
       if (parsedByFile.length) {
         const parsedCategories = parsedByFile.flat();
         const provider = providerFromCategories(parsedCategories);
+        const replacementProviders = new Set(
+          parsedCategories
+            .map((cat) => providerFromCategoryId(cat.id))
+            .filter((item): item is PlatformTab => item === "kakao" || item === "naver" || item === "generic")
+        );
 
         setDataset((prev) => {
           const next: Dataset = { ...prev };
+          replacementProviders.forEach((item) => {
+            categoryIdsForProvider(item).forEach((id) => {
+              delete next[id];
+            });
+          });
           for (const categories of parsedByFile) {
             for (const cat of categories) {
               const scoredRows = cat.rows.map((r) => applyScore(cat.id, r));
-              const existing = next[cat.id];
-              if (existing) {
-                const merged = cat.mergeDedupe
-                  ? scoredRows.filter((r) => !existing.rows.some((er) => er.serviceName === r.serviceName))
-                  : scoredRows;
-                next[cat.id] = { ...existing, rows: [...existing.rows, ...merged] };
-              } else {
-                next[cat.id] = {
-                  rows: scoredRows,
-                  source: cat.source,
-                  note: cat.note ?? null,
-                  comparable: COMPARABLE_CATEGORIES.includes(cat.id),
-                };
-              }
+              next[cat.id] = {
+                rows: scoredRows,
+                source: cat.source,
+                note: cat.note ?? null,
+                comparable: COMPARABLE_CATEGORIES.includes(cat.id),
+              };
             }
           }
+          return next;
+        });
+        setCleanupSelected((prev) => {
+          const next = new Set(prev);
+          [...next].forEach((key) => {
+            const categoryId = key.split(CLEANUP_KEY_SEPARATOR)[0] as CategoryId;
+            if (replacementProviders.has(providerFromCategoryId(categoryId))) next.delete(key);
+          });
           return next;
         });
         trackPocEvent("analysis_completed", { provider, duration_ms: Math.round(performance.now() - startedAt) });
       }
 
       if (newErrors.length) {
-        setErrors((prev) => [...prev, ...newErrors]);
         newErrors.forEach((errorType) => {
           trackPocEvent("analysis_failed", { provider: startedProvider, error_type: errorType });
         });
       }
+      setErrors(newErrors);
       setStage("done");
     });
   }, []);
@@ -366,6 +532,9 @@ export default function CypressClient() {
   };
 
   const toggleCleanupService = (cleanupKey: string) => {
+    const categoryId = cleanupKey.split(CLEANUP_KEY_SEPARATOR)[0] as CategoryId;
+    if (!isCleanupEligibleCategory(categoryId)) return;
+
     setCleanupSelected((prev) => {
       const next = new Set(prev);
       if (next.has(cleanupKey)) next.delete(cleanupKey);
@@ -374,33 +543,27 @@ export default function CypressClient() {
     });
   };
 
-  const submitCleanupReview = () => {
-    const selectedServices = [...new Set([...cleanupSelected].map(serviceNameFromCleanupKey))];
+  const submitCleanupReview = async () => {
     const custom = customService.trim();
-    if (customServiceEnabled && custom) selectedServices.push(custom);
+    const serviceItems = cleanupServiceItemsFromSelection(cleanupSelected, customServiceEnabled ? custom : "");
+    const selectedServices = serviceItems.map((item) => item.service);
+    if (selectedServices.length === 0 || cleanupSubmitting) return;
+    setCleanupSubmitting(true);
 
     trackPocEvent("cleanup_priority_submitted", {
       selected_count: selectedServices.length,
       custom_service_added: Boolean(customServiceEnabled && custom),
       language: locale,
     });
-    void recordCleanupRequest(selectedServices);
-    setCleanupStep("thanks");
-  };
+    const result = await recordCleanupRequest(selectedServices, serviceItems);
+    setCleanupSubmitting(false);
 
-  const tabLabel = (id: CategoryId): string => {
-    switch (id) {
-      case "kakao":
-        return t.tabs.kakao;
-      case "kakao_collect":
-        return t.tabs.kakaoCollect;
-      case "kakao_provider":
-        return t.tabs.kakaoProvider;
-      case "naver":
-        return t.tabs.naver;
-      default:
-        return t.tabs.generic;
+    if (result?.id) {
+      router.push(`/cleanup?request=${encodeURIComponent(result.id)}`);
+      return;
     }
+
+    setCleanupStep("thanks");
   };
 
   const openFilePicker = () => fileInputRef.current?.click();
@@ -447,17 +610,46 @@ export default function CypressClient() {
             <h1 className="max-w-2xl font-display text-3xl leading-tight md:text-4xl">{t.hero.title}</h1>
             <p className="mt-4 max-w-xl whitespace-pre-line text-sm leading-7 text-fog">{t.hero.body}</p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <button
-                type="button"
-                onClick={openFilePicker}
-                className="min-h-11 bg-slate px-6 py-3 text-sm tracking-wide text-ivory transition-opacity hover:opacity-90"
-              >
-                {t.cta.start}
+            <details id="howto" className="mt-8 border border-stone">
+              <summary className="cursor-pointer px-5 py-3 text-sm text-fog">{t.cta.howTo}</summary>
+              <div className="space-y-6 px-5 pb-6 text-sm">
+                <div>
+                  <p className="mb-2 font-medium">{t.howto.kakaoTitle}</p>
+                  <ol className="list-decimal space-y-1 pl-5 text-fog">
+                    {t.howto.kakaoSteps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div>
+                  <p className="mb-2 font-medium">{t.howto.naverTitle}</p>
+                  <ol className="list-decimal space-y-1 pl-5 text-fog">
+                    {t.howto.naverSteps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div className="grid gap-px overflow-hidden border border-stone bg-stone sm:grid-cols-2">
+                  <div className="bg-ivory p-4">
+                    <p className="text-xs font-medium">{t.formats.kakaoTitle}</p>
+                    <p className="mt-1 text-xs text-fog">{t.formats.kakaoDesc}</p>
+                  </div>
+                  <div className="bg-ivory p-4">
+                    <p className="text-xs font-medium">{t.formats.naverTitle}</p>
+                    <p className="mt-1 text-xs text-fog">{t.formats.naverDesc}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-fog">{t.formats.unsupportedNote}</p>
+              </div>
+            </details>
+
+            <div className="mt-6 border-l-2 border-stone bg-mist/40 px-5 py-4">
+              <p className="text-sm font-medium">{t.preStart.title}</p>
+              <p className="mt-2 text-xs leading-6 text-fog">{t.preStart.body}</p>
+              <p className="mt-1 text-xs text-fog">{t.preStart.legalNote}</p>
+              <button type="button" onClick={openPrivacyModal} className="mt-3 text-xs text-slate underline decoration-stone underline-offset-4">
+                {t.preStart.privacyLink}
               </button>
-              <a href="#howto" className="text-sm text-slate underline decoration-stone underline-offset-4 hover:decoration-slate">
-                {t.cta.howTo}
-              </a>
             </div>
 
             <div className="mt-10 grid gap-px overflow-hidden border border-stone bg-stone sm:grid-cols-3">
@@ -480,21 +672,62 @@ export default function CypressClient() {
         <section id="upload">
           <div
             data-testid="cypress-dropzone"
-            onClick={openFilePicker}
             onDragEnter={onDragEnter}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
-            className={`cursor-pointer border px-6 py-10 text-center transition-colors ${
-              dragActive ? "border-slate bg-mist" : "border-stone bg-ivory hover:bg-mist/60"
+            className={`border p-5 transition-colors ${
+              dragActive ? "border-slate bg-mist" : "border-stone bg-ivory"
             }`}
           >
-            <p className="text-sm">{t.dropzone.main}</p>
-            <p className="mx-auto mt-2 max-w-md text-xs text-fog">{t.dropzone.sub}</p>
+            <div className="flex flex-col gap-3 border-b border-stone pb-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-sm">{t.dropzone.main}</p>
+                <p className="mt-2 max-w-xl text-xs leading-6 text-fog">{t.dropzone.sub}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {uploadedFiles.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={resetUploadedFiles}
+                    className="border border-stone px-4 py-2 text-xs text-fog transition-colors hover:border-slate hover:text-slate"
+                  >
+                    {t.dropzone.clearFiles}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={openFilePicker}
+                  className="border border-slate bg-slate px-4 py-2 text-xs text-ivory transition-colors hover:bg-slate-700"
+                >
+                  {t.dropzone.chooseFiles}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <UploadSlot
+                title="Kakao"
+                expected={t.dropzone.kakaoExpected}
+                files={uploadedFiles.filter((file) => file.provider === "kakao")}
+                active={dragActive}
+                onClick={openFilePicker}
+                onClear={() => clearUploadedProvider("kakao")}
+                t={t}
+              />
+              <UploadSlot
+                title="Naver"
+                expected={t.dropzone.naverExpected}
+                files={uploadedFiles.filter((file) => file.provider === "naver")}
+                active={dragActive}
+                onClick={openFilePicker}
+                onClear={() => clearUploadedProvider("naver")}
+                t={t}
+              />
+            </div>
             <input
               ref={fileInputRef}
               type="file"
-              multiple
               accept=".html,.htm,.json,.har"
               className="hidden"
               onChange={(e) => handleFiles(e.target.files)}
@@ -515,49 +748,6 @@ export default function CypressClient() {
             </div>
           ))}
 
-          <details id="howto" className="mt-6 border border-stone">
-            <summary className="cursor-pointer px-5 py-3 text-sm text-fog">{t.cta.howTo}</summary>
-            <div className="space-y-6 px-5 pb-6 text-sm">
-              <div>
-                <p className="mb-2 font-medium">{t.howto.kakaoTitle}</p>
-                <ol className="list-decimal space-y-1 pl-5 text-fog">
-                  {t.howto.kakaoSteps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </ol>
-              </div>
-              <div>
-                <p className="mb-2 font-medium">{t.howto.naverTitle}</p>
-                <ol className="list-decimal space-y-1 pl-5 text-fog">
-                  {t.howto.naverSteps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </ol>
-              </div>
-              <div className="grid gap-px overflow-hidden border border-stone bg-stone sm:grid-cols-2">
-                <div className="bg-ivory p-4">
-                  <p className="text-xs font-medium">{t.formats.kakaoTitle}</p>
-                  <p className="mt-1 text-xs text-fog">{t.formats.kakaoDesc}</p>
-                </div>
-                <div className="bg-ivory p-4">
-                  <p className="text-xs font-medium">{t.formats.naverTitle}</p>
-                  <p className="mt-1 text-xs text-fog">{t.formats.naverDesc}</p>
-                </div>
-              </div>
-              <p className="text-xs text-fog">{t.formats.unsupportedNote}</p>
-            </div>
-          </details>
-
-          {!hasAnyData && (
-            <div className="mt-6 border-l-2 border-stone bg-mist/40 px-5 py-4">
-              <p className="text-sm font-medium">{t.preStart.title}</p>
-              <p className="mt-2 text-xs leading-6 text-fog">{t.preStart.body}</p>
-              <p className="mt-1 text-xs text-fog">{t.preStart.legalNote}</p>
-              <button type="button" onClick={openPrivacyModal} className="mt-3 text-xs text-slate underline decoration-stone underline-offset-4">
-                {t.preStart.privacyLink}
-              </button>
-            </div>
-          )}
         </section>
 
         {hasAnyData && activeCategoryId && (
@@ -584,6 +774,7 @@ export default function CypressClient() {
               selected={cleanupSelected}
               customServiceEnabled={customServiceEnabled}
               customService={customService}
+              submitting={cleanupSubmitting}
               onStart={openCleanupReview}
               onToggleCustom={() => setCustomServiceEnabled((value) => !value)}
               onCustomServiceChange={setCustomService}
@@ -609,24 +800,6 @@ export default function CypressClient() {
                   </button>
                 ))}
             </div>
-
-            {platformTab === "kakao" && (
-              <div className="mt-3 flex gap-1">
-                {(["kakao", "kakao_collect", "kakao_provider"] as CategoryId[])
-                  .filter((id) => Boolean(dataset[id]))
-                  .map((id) => (
-                    <button
-                      key={id}
-                      onClick={() => setKakaoSubTab(id)}
-                      className={`px-3 py-1.5 font-mono text-xs transition-colors ${
-                        kakaoSubTab === id ? "bg-slate text-ivory" : "bg-mist text-fog hover:text-slate"
-                      }`}
-                    >
-                      {tabLabel(id)}
-                    </button>
-                  ))}
-              </div>
-            )}
 
             <div className="mt-6 grid gap-px overflow-hidden border border-stone bg-stone sm:grid-cols-2">
               <div className="bg-ivory p-4">
@@ -738,7 +911,7 @@ export default function CypressClient() {
                     isRequested={requested.has(r.serviceName)}
                     onRequestSingle={requestSingle}
                     onMailtoClick={onMailtoClick}
-                    cleanupMode={cleanupMode}
+                    cleanupMode={cleanupMode && isCleanupEligibleCategory(activeCategoryId)}
                     cleanupKey={cleanupKeyForRow(activeCategoryId, r, originalIndex)}
                     cleanupSelected={cleanupSelected.has(cleanupKeyForRow(activeCategoryId, r, originalIndex))}
                     onToggleCleanup={toggleCleanupService}
@@ -771,7 +944,7 @@ export default function CypressClient() {
                         isRequested={requested.has(r.serviceName)}
                         onRequestSingle={requestSingle}
                         onMailtoClick={onMailtoClick}
-                        cleanupMode={cleanupMode}
+                        cleanupMode={cleanupMode && isCleanupEligibleCategory("kakao_collect_extra")}
                         cleanupKey={cleanupKeyForRow("kakao_collect_extra", r, originalIndex)}
                         cleanupSelected={cleanupSelected.has(cleanupKeyForRow("kakao_collect_extra", r, originalIndex))}
                         onToggleCleanup={toggleCleanupService}
@@ -839,6 +1012,7 @@ const CleanupReviewSection = forwardRef<HTMLElement, {
   selected: Set<string>;
   customServiceEnabled: boolean;
   customService: string;
+  submitting: boolean;
   onStart: () => void;
   onToggleCustom: () => void;
   onCustomServiceChange: (value: string) => void;
@@ -851,6 +1025,7 @@ const CleanupReviewSection = forwardRef<HTMLElement, {
   selected,
   customServiceEnabled,
   customService,
+  submitting,
   onStart,
   onToggleCustom,
   onCustomServiceChange,
@@ -930,11 +1105,11 @@ const CleanupReviewSection = forwardRef<HTMLElement, {
           <p className="mt-5 whitespace-pre-line border-t border-stone pt-5 text-xs leading-6 text-fog">{t.cleanupReview.privacyNote}</p>
           <button
             type="button"
-            disabled={!canSubmit}
+            disabled={!canSubmit || submitting}
             onClick={onSubmit}
             className="mt-6 min-h-12 w-full bg-slate px-6 py-3 text-xs tracking-[0.16em] text-ivory transition-opacity hover:opacity-90 disabled:opacity-35"
           >
-            {t.cleanupReview.submit}
+            {submitting ? t.cleanupReview.submitting : t.cleanupReview.submit}
           </button>
         </div>
         )}
@@ -989,6 +1164,74 @@ function FloatingCleanupControls({
       >
         ↓
       </button>
+    </div>
+  );
+}
+
+function UploadSlot({
+  title,
+  expected,
+  files,
+  active,
+  onClick,
+  onClear,
+  t,
+}: {
+  title: string;
+  expected: string;
+  files: UploadedFileStatus[];
+  active: boolean;
+  onClick: () => void;
+  onClear: () => void;
+  t: (typeof CYPRESS_CONTENT)["ko"];
+}) {
+  const readyFiles = files.filter((file) => file.status === "ready");
+
+  return (
+    <div
+      className={`min-h-40 border p-5 text-left transition-colors ${
+        active ? "border-slate bg-ivory" : "border-stone bg-[#fbfaf7] hover:border-slate/45 hover:bg-mist/45"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-[11px] tracking-[0.16em] text-fog uppercase">{title}</p>
+          <p className="mt-2 text-sm text-slate">{readyFiles.length > 0 ? t.dropzone.filesReady(readyFiles.length) : t.dropzone.slotEmpty}</p>
+        </div>
+        <span
+          className={`border px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] ${
+            readyFiles.length > 0 ? "border-slate text-slate" : "border-stone text-fog"
+          }`}
+        >
+          {readyFiles.length > 0 ? t.dropzone.ready : t.dropzone.empty}
+        </span>
+      </div>
+      <p className="mt-4 text-xs leading-5 text-fog">{expected}</p>
+      {readyFiles.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {readyFiles.map((file, index) => (
+            <div key={`${file.name}-${index}`} className="flex items-center justify-between gap-3 border border-stone bg-ivory px-3 py-2">
+              <p className="truncate text-xs text-slate">{file.name}</p>
+              <button
+                type="button"
+                onClick={onClear}
+                className="shrink-0 font-mono text-[10px] tracking-[0.12em] text-fog underline decoration-stone underline-offset-4 transition-colors hover:text-slate"
+              >
+                {t.dropzone.clearSlot}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {readyFiles.length === 0 && (
+        <button
+          type="button"
+          onClick={onClick}
+          className="mt-4 border border-stone px-3 py-2 text-xs text-fog transition-colors hover:border-slate hover:text-slate"
+        >
+          {t.dropzone.chooseFiles}
+        </button>
+      )}
     </div>
   );
 }

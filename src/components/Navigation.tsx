@@ -68,6 +68,15 @@ export default function Navigation({ forceScrolled = false }: NavigationProps) {
             {t.nav.privacy}
           </button>
 
+          <a
+            href="/notes/right-to-be-forgotten"
+            className={`hidden min-h-[44px] items-center text-xs tracking-widest transition-colors md:flex ${
+              scrolled ? "text-slate-500 hover:text-slate-800" : "text-white/62 hover:text-white"
+            }`}
+          >
+            {t.nav.reading}
+          </a>
+
           {/* Language toggle */}
           <div className="flex items-center gap-1">
             {LOCALES.map((l, i) => (

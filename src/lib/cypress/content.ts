@@ -10,13 +10,29 @@ export interface CypressContent {
     naverTitle: string;
     naverSteps: string[];
   };
-  dropzone: { main: string; sub: string; privacyNote: string };
+  dropzone: {
+    main: string;
+    sub: string;
+    privacyNote: string;
+    chooseFiles: string;
+    clearFiles: string;
+    clearSlot: string;
+    ready: string;
+    empty: string;
+    filesReady: (count: number) => string;
+    slotEmpty: string;
+    kakaoExpected: string;
+    naverExpected: string;
+    otherFiles: string;
+  };
   formats: { kakaoTitle: string; kakaoDesc: string; naverTitle: string; naverDesc: string; unsupportedNote: string };
   preStart: { title: string; body: string; legalNote: string; privacyLink: string };
   progress: { reading: string; parsing: string; scoring: string; done: string };
   errors: {
     harUnrecognized: string;
     fileTypeUnrecognized: string;
+    kakaoThirdPartyRequired: string;
+    naverHarRequired: string;
   };
   disclaimer: { snapshot: string; scoreMeaning: string };
   tabs: {
@@ -83,6 +99,7 @@ export interface CypressContent {
     customPlaceholder: string;
     rowCheckboxLabel: (serviceName: string) => string;
     submit: string;
+    submitting: string;
     privacyNote: string;
     backToResults: string;
     thanksEyebrow: string;
@@ -119,32 +136,42 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     cta: { start: "시작하기 — 파일 업로드", howTo: "파일 준비 방법 보기" },
     trust: {
       localTitle: "로컬 처리",
-      storageTitle: "저장 없음",
-      storageBody: "localStorage·IndexedDB를 사용하지 않습니다. 탭을 닫으면 데이터가 즉시 소멸합니다.",
+      storageTitle: "저장 범위",
+      storageBody: "업로드한 파일, 파일명, 분석 결과, 자동으로 추출된 전체 서비스 목록은 저장하지 않습니다.",
       opennessTitle: "열린 분석",
     },
     howto: {
       kakaoTitle: "카카오",
       kakaoSteps: [
         "accounts.kakao.com 로그인 → 계정 이용 → 개인정보 이용 현황",
-        "\"수집 및 이용\" / \"제3자 제공\" / \"처리 위탁\" 탭을 각각 클릭 → Cmd/Ctrl+S로 저장 (총 3개 파일)",
+        "\"제3자 제공\" 탭을 클릭한 뒤 Cmd/Ctrl+S로 HTML 저장",
       ],
       naverTitle: "네이버",
       naverSteps: [
-        "nid.naver.com에서 연결된 서비스 관리 페이지 저장 (목록만 캡처됨)",
-        "더 정확히 하려면: 개발자도구 Network 탭 → 페이지 새로고침 → 우클릭 → Save all as HAR로 통째로 저장",
+        "nid.naver.com에서 연결된 서비스 관리 페이지 접속",
+        "개발자도구 Network 탭 → 페이지 새로고침 → 우클릭 → Save all as HAR로 저장",
       ],
     },
     dropzone: {
-      main: "여기로 파일을 끌어다 놓으세요",
-      sub: "카카오 HTML 3종(수집 및 이용/제3자 제공/처리 위탁) · 네이버 HTML · 네이버 HAR/JSON — 여러 개 한번에 가능",
+      main: "파일을 준비해 주세요",
+      sub: "카카오와 네이버 파일을 각각 하나씩 올릴 수 있습니다. 새 파일을 올리면 기존 파일은 교체됩니다.",
       privacyNote: "서버로 전송되지 않음 · 이 브라우저 탭 안에서만 처리됨",
+      chooseFiles: "파일 선택",
+      clearFiles: "파일 해제",
+      clearSlot: "해제",
+      ready: "READY",
+      empty: "EMPTY",
+      filesReady: (count) => `${count}개 파일 준비됨`,
+      slotEmpty: "파일을 여기에 놓아주세요",
+      kakaoExpected: "카카오 제3자 제공 HTML",
+      naverExpected: "네이버 연결된 서비스 HAR",
+      otherFiles: "OTHER FILES",
     },
     formats: {
-      kakaoTitle: "카카오 개인정보 현황",
-      kakaoDesc: "개인정보 이용 현황 페이지를 HTML로 저장한 파일 (.html)",
+      kakaoTitle: "카카오 제3자 제공",
+      kakaoDesc: "개인정보 이용 현황에서 제3자 제공 탭을 HTML로 저장한 파일 (.html)",
       naverTitle: "네이버 연결된 서비스",
-      naverDesc: "네이버 계정 설정에서 내보낸 HTML 저장본 또는 HAR 파일 (.html / .har)",
+      naverDesc: "연결된 서비스 관리 페이지를 HAR로 저장한 파일 (.har)",
       unsupportedNote: "지원하지 않는 파일 형식을 업로드하면 인식 실패 안내와 함께 저장 방법을 안내받을 수 있습니다.",
     },
     preStart: {
@@ -162,6 +189,8 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "HAR 파일 안에서 연결된 서비스 데이터를 찾지 못했습니다. 연결된 서비스 페이지를 새로고침한 뒤 다시 내보내주세요.",
       fileTypeUnrecognized: "이 파일 형식을 인식하지 못했습니다. 지원 형식(.html/.htm/.json/.har)을 확인해주세요.",
+      kakaoThirdPartyRequired: "카카오는 개인정보 이용 현황의 \"제3자 제공\" 탭을 HTML로 저장한 파일만 올려주세요.",
+      naverHarRequired: "네이버는 연결된 서비스 관리 페이지에서 저장한 HAR 파일만 올려주세요.",
     },
     disclaimer: {
       snapshot: "이 데이터는 가입/연동 당시 동의한 항목의 스냅샷입니다.",
@@ -225,7 +254,11 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       disclosures: [
         {
           title: "개인정보 보호",
-          body: "업로드한 파일은 브라우저 안에서만 분석됩니다. 파일은 Lethe 서버로 전송되지 않으며, 분석 결과와 데이터는 페이지를 새로고침하거나 종료하면 모두 사라집니다.",
+          body: "업로드한 파일은 브라우저 안에서만 분석됩니다. 파일 내용과 분석 결과는 Lethe 서버로 전송되지 않으며, 페이지를 새로고침하거나 종료하면 분석 데이터는 모두 사라집니다.",
+        },
+        {
+          title: "저장 범위",
+          body: "업로드한 파일, 파일명, 분석 결과, 자동으로 추출된 전체 서비스 목록은 저장하지 않습니다. 서비스를 더 편리하게 만들기 위해 페이지 방문이나 버튼 클릭과 같은 비식별 이용 통계를 확인할 수 있습니다. 삭제 검토를 요청할 경우, 직접 선택하거나 입력한 서비스명은 삭제 가이드 준비와 지원 우선순위 검토에 사용될 수 있습니다.",
         },
         {
           title: "분석 결과에 대하여",
@@ -237,7 +270,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
         },
         {
           title: "Lethe의 약속",
-          body: "당신의 데이터는 당신의 것입니다.\n\nLethe는 사용자의 데이터를 수집하거나 보관하는 것을 주 목적으로 하지 않습니다. 우리는 당신이 스스로의 데이터를 이해하고, 더 나은 선택을 할 수 있도록 돕기 위해 존재합니다.",
+          body: "당신의 데이터는 당신의 것입니다. Lethe는 사용자의 파일이나 분석 결과를 수집하고 보관하는 것을 목적으로 하지 않습니다. 우리는 당신이 스스로의 데이터를 이해하고, 더 나은 선택을 할 수 있도록 돕기 위해 존재합니다.",
         },
       ],
     },
@@ -252,8 +285,9 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       customPlaceholder: "서비스 이름을 직접 입력해 주세요",
       rowCheckboxLabel: (serviceName) => `${serviceName} 정리 검토 대상으로 선택`,
       submit: "삭제 검토 제출하기",
+      submitting: "저장하고 있습니다",
       privacyNote:
-        "업로드한 파일과 분석 결과는 전송되지 않습니다.\n\n사용자가 직접 선택하여 제출한 서비스명만 Lethe의 삭제 지원 우선순위를 결정하기 위한 연구 목적으로 전달됩니다.\n\n아래 버튼을 누르면 위 내용에 동의하게 됩니다.",
+        "업로드한 파일과 분석 결과는 전송되지 않습니다.\n\n삭제 검토를 요청할 경우, 직접 선택하거나 입력한 서비스명은 삭제 가이드 준비와 지원 우선순위 검토에 사용될 수 있습니다.\n\n아래 버튼을 누르면 위 내용에 동의하게 됩니다.",
       backToResults: "분석 결과로 돌아가기",
       thanksEyebrow: "의견이 도착했습니다",
       thanksTitle: "감사합니다.",
@@ -289,32 +323,42 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     cta: { start: "Start — upload a file", howTo: "See how to prepare your files" },
     trust: {
       localTitle: "Local processing",
-      storageTitle: "Nothing stored",
-      storageBody: "No localStorage or IndexedDB is used. Data disappears the moment you close the tab.",
+      storageTitle: "What is stored",
+      storageBody: "Uploaded files, file names, analysis results, and the full automatically extracted service list are not stored.",
       opennessTitle: "Open scoring",
     },
     howto: {
       kakaoTitle: "Kakao",
       kakaoSteps: [
         "Log in at accounts.kakao.com → Account → Personal data usage status",
-        "Open each of \"Collection & Use\" / \"Third-party sharing\" / \"Processing outsourcing\" and save with Cmd/Ctrl+S (3 files total)",
+        "Open the \"Third-party sharing\" tab and save it as HTML with Cmd/Ctrl+S",
       ],
       naverTitle: "Naver",
       naverSteps: [
-        "Save the connected-services page from nid.naver.com (captures the list only)",
-        "For full detail: open DevTools Network tab → refresh the page → right-click → \"Save all as HAR\"",
+        "Open the connected-services management page at nid.naver.com",
+        "Open DevTools Network tab → refresh the page → right-click → Save all as HAR",
       ],
     },
     dropzone: {
-      main: "Drop your files here",
-      sub: "Kakao's 3 HTML files (collection/third-party/outsourcing) · Naver HTML · Naver HAR/JSON — multiple at once is fine",
+      main: "Prepare your files",
+      sub: "You can upload one Kakao file and one Naver file. Uploading a new file replaces the previous one for that slot.",
       privacyNote: "Never sent to a server · processed only in this browser tab",
+      chooseFiles: "Choose files",
+      clearFiles: "Clear files",
+      clearSlot: "Clear",
+      ready: "READY",
+      empty: "EMPTY",
+      filesReady: (count) => `${count} file${count === 1 ? "" : "s"} ready`,
+      slotEmpty: "Drop files here",
+      kakaoExpected: "Kakao third-party sharing HTML",
+      naverExpected: "Naver connected-services HAR",
+      otherFiles: "OTHER FILES",
     },
     formats: {
-      kakaoTitle: "Kakao personal data status",
-      kakaoDesc: "The personal-data usage page saved as HTML (.html)",
+      kakaoTitle: "Kakao third-party sharing",
+      kakaoDesc: "The third-party sharing tab from Kakao personal data status saved as HTML (.html)",
       naverTitle: "Naver connected services",
-      naverDesc: "HTML export from Naver account settings, or a HAR file (.html / .har)",
+      naverDesc: "A HAR file saved from the connected-services management page (.har)",
       unsupportedNote: "If an unsupported file type is uploaded, you'll get a recognition-failure notice with saving instructions.",
     },
     preStart: {
@@ -332,6 +376,8 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "Couldn't find connected-service data in this HAR file. Refresh the connected-services page and export again.",
       fileTypeUnrecognized: "This file type wasn't recognized. Please check the supported formats (.html/.htm/.json/.har).",
+      kakaoThirdPartyRequired: "For Kakao, upload only the HTML file saved from the \"Third-party sharing\" tab.",
+      naverHarRequired: "For Naver, upload only the HAR file saved from the connected-services management page.",
     },
     disclaimer: {
       snapshot: "This data is a snapshot of what you agreed to at signup or linking time.",
@@ -395,7 +441,11 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       disclosures: [
         {
           title: "Privacy protection",
-          body: "Uploaded files are analyzed only inside your browser. Files are not sent to Lethe servers, and the analysis results and data disappear when you refresh or close the page.",
+          body: "Uploaded files are analyzed only inside your browser. File contents and analysis results are not sent to Lethe servers, and analysis data disappears when you refresh or close the page.",
+        },
+        {
+          title: "What is stored",
+          body: "Uploaded files, file names, analysis results, and the full automatically extracted service list are not stored. To make the service easier to use, Lethe may review non-identifying usage analytics such as page visits or button clicks. If you request a cleanup review, the service names you directly select or enter may be used to prepare deletion guides and review support priorities.",
         },
         {
           title: "About analysis results",
@@ -407,7 +457,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
         },
         {
           title: "Lethe's promise",
-          body: "Your data belongs to you.\n\nLethe does not exist to collect or store user data as its primary purpose. We exist to help you understand your own data and make better choices.",
+          body: "Your data belongs to you. Lethe does not exist to collect or store your files or analysis results. We exist to help you understand your own data and make better choices.",
         },
       ],
     },
@@ -422,8 +472,9 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       customPlaceholder: "Enter a service name",
       rowCheckboxLabel: (serviceName) => `Select ${serviceName} for cleanup review`,
       submit: "Submit cleanup review",
+      submitting: "Saving",
       privacyNote:
-        "Uploaded files and analysis results are not sent.\n\nOnly the service names you choose to submit are shared for research that helps Lethe decide cleanup-support priorities.\n\nBy pressing the button below, you agree to the above.",
+        "Uploaded files and analysis results are not sent.\n\nIf you request a cleanup review, the service names you directly select or enter may be used to prepare deletion guides and review support priorities.\n\nBy pressing the button below, you agree to the above.",
       backToResults: "Back to analysis results",
       thanksEyebrow: "Your signal was received",
       thanksTitle: "Thank you.",
@@ -459,32 +510,42 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     cta: { start: "始める — ファイルをアップロード", howTo: "ファイルの準備方法を見る" },
     trust: {
       localTitle: "ローカル処理",
-      storageTitle: "保存なし",
-      storageBody: "localStorage・IndexedDBを使用しません。タブを閉じるとデータは即座に消滅します。",
+      storageTitle: "保存される範囲",
+      storageBody: "アップロードしたファイル、ファイル名、分析結果、自動抽出されたサービス一覧全体は保存されません。",
       opennessTitle: "開かれた分析",
     },
     howto: {
       kakaoTitle: "Kakao",
       kakaoSteps: [
         "accounts.kakao.comにログイン → アカウント → 個人情報利用現況",
-        "「収集及び利用」「第三者提供」「処理委託」タブをそれぞれ開き、Cmd/Ctrl+Sで保存(計3ファイル)",
+        "「第三者提供」タブを開き、Cmd/Ctrl+SでHTMLとして保存",
       ],
       naverTitle: "Naver",
       naverSteps: [
-        "nid.naver.comで連携サービス管理ページを保存(一覧のみキャプチャ)",
-        "より正確にするには: 開発者ツールのNetworkタブ → ページ再読み込み → 右クリック → 「Save all as HAR」で丸ごと保存",
+        "nid.naver.comで連携サービス管理ページを開く",
+        "開発者ツールのNetworkタブ → ページ再読み込み → 右クリック → Save all as HARで保存",
       ],
     },
     dropzone: {
-      main: "ここにファイルをドロップしてください",
-      sub: "Kakao HTML 3種(収集及び利用/第三者提供/処理委託)・Naver HTML・Naver HAR/JSON — 複数同時可",
+      main: "ファイルを準備してください",
+      sub: "KakaoファイルとNaverファイルをそれぞれ1件ずつアップロードできます。新しいファイルを入れると、そのスロットの既存ファイルは置き換わります。",
       privacyNote: "サーバーには送信されません · このブラウザタブ内でのみ処理されます",
+      chooseFiles: "ファイルを選択",
+      clearFiles: "ファイル解除",
+      clearSlot: "解除",
+      ready: "READY",
+      empty: "EMPTY",
+      filesReady: (count) => `${count}件のファイル準備完了`,
+      slotEmpty: "ここにファイルを置いてください",
+      kakaoExpected: "Kakao第三者提供HTML",
+      naverExpected: "Naver連携サービスHAR",
+      otherFiles: "OTHER FILES",
     },
     formats: {
-      kakaoTitle: "Kakao個人情報現況",
-      kakaoDesc: "個人情報利用現況ページをHTMLで保存したファイル (.html)",
+      kakaoTitle: "Kakao第三者提供",
+      kakaoDesc: "Kakao個人情報現況の第三者提供タブをHTMLで保存したファイル (.html)",
       naverTitle: "Naver連携サービス",
-      naverDesc: "Naverアカウント設定から書き出したHTML保存版、またはHARファイル (.html / .har)",
+      naverDesc: "連携サービス管理ページから保存したHARファイル (.har)",
       unsupportedNote: "サポート外のファイル形式をアップロードすると、認識失敗の案内と保存方法が表示されます。",
     },
     preStart: {
@@ -502,6 +563,8 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
     errors: {
       harUnrecognized: "HARファイル内で連携サービスのデータが見つかりませんでした。連携サービスページを再読み込みしてから再度書き出してください。",
       fileTypeUnrecognized: "このファイル形式は認識できませんでした。対応形式(.html/.htm/.json/.har)をご確認ください。",
+      kakaoThirdPartyRequired: "Kakaoは、個人情報現況の「第三者提供」タブをHTMLで保存したファイルのみアップロードしてください。",
+      naverHarRequired: "Naverは、連携サービス管理ページから保存したHARファイルのみアップロードしてください。",
     },
     disclaimer: {
       snapshot: "このデータは登録・連携当時に同意した項目のスナップショットです。",
@@ -565,7 +628,11 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       disclosures: [
         {
           title: "個人情報の保護",
-          body: "アップロードしたファイルはブラウザ内だけで分析されます。ファイルはLetheのサーバーに送信されず、分析結果とデータはページを更新または終了するとすべて消えます。",
+          body: "アップロードしたファイルはブラウザ内だけで分析されます。ファイル内容と分析結果はLetheのサーバーに送信されず、ページを更新または終了すると分析データはすべて消えます。",
+        },
+        {
+          title: "保存される範囲",
+          body: "アップロードしたファイル、ファイル名、分析結果、自動抽出されたサービス一覧全体は保存されません。サービスをより使いやすくするため、ページ訪問やボタンのクリックなど、個人を特定しない利用統計を確認することがあります。削除検討を依頼する場合、直接選択または入力したサービス名は、削除ガイドの準備と支援優先順位の検討に使用されることがあります。",
         },
         {
           title: "分析結果について",
@@ -577,7 +644,7 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
         },
         {
           title: "Letheの約束",
-          body: "あなたのデータは、あなたのものです。\n\nLetheは、ユーザーのデータを収集したり保管したりすることを主な目的としていません。私たちは、あなたが自分自身のデータを理解し、よりよい選択ができるよう支援するために存在します。",
+          body: "あなたのデータは、あなたのものです。Letheは、ユーザーのファイルや分析結果を収集・保管することを目的としていません。私たちは、あなたが自分自身のデータを理解し、よりよい選択ができるよう支援するために存在します。",
         },
       ],
     },
@@ -592,8 +659,9 @@ export const CYPRESS_CONTENT: Record<Locale, CypressContent> = {
       customPlaceholder: "サービス名を入力してください",
       rowCheckboxLabel: (serviceName) => `${serviceName}を整理検討対象として選択`,
       submit: "削除検討を送信する",
+      submitting: "保存しています",
       privacyNote:
-        "アップロードしたファイルと分析結果は送信されません。\n\nユーザーが自分で選択して送信したサービス名だけが、Letheの削除支援の優先順位を決めるための研究目的で送信されます。\n\n下のボタンを押すと、上記の内容に同意したものとみなされます。",
+        "アップロードしたファイルと分析結果は送信されません。\n\n削除検討を依頼する場合、直接選択または入力したサービス名は、削除ガイドの準備と支援優先順位の検討に使用されることがあります。\n\n下のボタンを押すと、上記の内容に同意したものとみなされます。",
       backToResults: "分析結果に戻る",
       thanksEyebrow: "ご意見を受け取りました",
       thanksTitle: "ありがとうございます。",
