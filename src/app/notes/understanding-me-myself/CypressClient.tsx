@@ -13,6 +13,7 @@ import { gradeOf, scoreFromCategories, staleMultiplier } from "@/lib/cypress/sco
 import { parseFile, type CategoryId, type ParsedCategory } from "@/lib/cypress/parsers";
 import { SERVICE_EMAIL_MAP } from "@/lib/cypress/serviceEmailMap";
 import type { NormalizedRow, TabDataset } from "@/lib/cypress/types";
+import { recordCleanupRequest, recordLetheEvent, type LetheEventName, type LetheEventProperties } from "@/lib/analytics/client";
 
 type Dataset = Partial<Record<CategoryId, TabDataset>>;
 type PlatformTab = "kakao" | "naver" | "generic";
@@ -161,6 +162,11 @@ function computeTabAnalytics(rows: NormalizedRow[], hasRisk: boolean) {
   return { total: byName.size, highRisk, catCounts };
 }
 
+function trackPocEvent(event: LetheEventName, properties: LetheEventProperties = {}) {
+  track(event, properties);
+  void recordLetheEvent(event, properties);
+}
+
 export default function CypressClient() {
   const { locale, setLocale } = useLanguage();
   const t = CYPRESS_CONTENT[locale];
@@ -240,7 +246,7 @@ export default function CypressClient() {
       setStage("parsing");
       const startedAt = performance.now();
       const startedProvider = providerFromReadResults(results);
-      track("analysis_started", { provider: startedProvider, file_count: files.length });
+      trackPocEvent("analysis_started", { provider: startedProvider, file_count: files.length });
 
       const newErrors: (keyof CypressContent["errors"])[] = [];
       const parsedByFile: ParsedCategory[][] = [];
@@ -290,13 +296,13 @@ export default function CypressClient() {
           }
           return next;
         });
-        track("analysis_completed", { provider, duration_ms: Math.round(performance.now() - startedAt) });
+        trackPocEvent("analysis_completed", { provider, duration_ms: Math.round(performance.now() - startedAt) });
       }
 
       if (newErrors.length) {
         setErrors((prev) => [...prev, ...newErrors]);
         newErrors.forEach((errorType) => {
-          track("analysis_failed", { provider: startedProvider, error_type: errorType });
+          trackPocEvent("analysis_failed", { provider: startedProvider, error_type: errorType });
         });
       }
       setStage("done");
@@ -352,7 +358,7 @@ export default function CypressClient() {
   }, [dataset, requested]);
 
   const openCleanupReview = () => {
-    track("cleanup_interest_clicked", { provider: providerFromDataset(dataset), language: locale });
+    trackPocEvent("cleanup_interest_clicked", { provider: providerFromDataset(dataset), language: locale });
     setCleanupMode(true);
     requestAnimationFrame(() => {
       cleanupSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -373,12 +379,12 @@ export default function CypressClient() {
     const custom = customService.trim();
     if (customServiceEnabled && custom) selectedServices.push(custom);
 
-    track("cleanup_priority_submitted", {
-      selected_services: JSON.stringify(selectedServices),
+    trackPocEvent("cleanup_priority_submitted", {
       selected_count: selectedServices.length,
       custom_service_added: Boolean(customServiceEnabled && custom),
       language: locale,
     });
+    void recordCleanupRequest(selectedServices);
     setCleanupStep("thanks");
   };
 
